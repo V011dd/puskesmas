@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SyncHealth — Puskesmas Jumpandang Baru</title>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon"><i class="ti ti-heart-plus"></i></div>
+    <div>
+      <div class="logo-text">SyncHealth</div>
+      <div class="logo-sub">Puskesmas Jumpandang Baru</div>
+    </div>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-label">Menu Utama</div>
+  <div class="nav-item active" id="nav-dash" onclick="goPage('dash')" style="background:linear-gradient(135deg,#16a34a,#0d9488)">
+    <i class="ti ti-layout-dashboard"></i> Dashboard
+  </div>
+  <div class="nav-item" id="nav-tugas" onclick="goPage('tugas')">
+    <i class="ti ti-checklist"></i> Manajemen Tugas <span class="badge">5</span>
+  </div>
+  <div class="nav-item" id="nav-eval" onclick="goPage('eval')">
+    <i class="ti ti-chart-bar"></i> Evaluasi Capaian
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-label">Lainnya</div>
+  <div class="nav-item">
+    <i class="ti ti-bell"></i> Notifikasi
+  </div>
+  <div class="nav-item">
+    <i class="ti ti-users"></i> Tim & Profil
+  </div>
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="avatar" style="background:var(--green-l);color:var(--green-d)">DS</div>
+      <div>
+        <div style="font-size:12px;font-weight:700">dr. Sari</div>
+        <div style="font-size:10px;color:var(--text3)">Kepala Puskesmas</div>
+      </div>
+      <i class="ti ti-settings" style="margin-left:auto;color:var(--text3);font-size:16px"></i>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="page-title">Dashboard</div>
+    <div class="topbar-search"><i class="ti ti-search" style="font-size:15px"></i><span>Cari tugas, program...</span></div>
+    <div class="notif-btn"><i class="ti ti-bell"></i><div class="notif-dot"></div></div>
+    <div class="avatar" style="width:34px;height:34px;background:var(--green-l);color:var(--green-d);font-size:12px;font-weight:800;cursor:pointer;border-radius:50%;flex-shrink:0">DS</div>
+  </div>
+  <div class="content">
+
+    <!-- ==================== DASHBOARD ==================== -->
+    <div class="page active" id="page-dash">
+
+      <div class="stat-grid">
+        <div class="stat-card" style="background:linear-gradient(135deg,#16a34a,#0d9488);color:#fff">
+          <div class="stat-label">Total Tugas Aktif</div>
+          <div class="stat-val">24</div>
+          <div class="stat-sub">↑ 3 tugas baru minggu ini</div>
+          <i class="ti ti-checklist stat-icon"></i>
+        </div>
+        <div class="stat-card" style="background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff">
+          <div class="stat-label">Program Berjalan</div>
+          <div class="stat-val">8</div>
+          <div class="stat-sub">6 on-track, 2 perlu perhatian</div>
+          <i class="ti ti-clipboard-list stat-icon"></i>
+        </div>
+        <div class="stat-card" style="background:linear-gradient(135deg,#ea580c,#d97706);color:#fff">
+          <div class="stat-label">Rata-rata Capaian</div>
+          <div class="stat-val">78%</div>
+          <div class="stat-sub">↑ 5% dari bulan lalu</div>
+          <i class="ti ti-chart-pie stat-icon"></i>
+        </div>
+        <div class="stat-card" style="background:linear-gradient(135deg,#db2777,#7c3aed);color:#fff">
+          <div class="stat-label">Anggota Tim</div>
+          <div class="stat-val">12</div>
+          <div class="stat-sub">9 online sekarang</div>
+          <i class="ti ti-users stat-icon"></i>
+        </div>
+      </div>
+
+      <div class="section-grid">
+        <!-- TUGAS HARI INI -->
+        <div class="card">
+          <div class="section-title">
+            <div class="dot" style="background:var(--green)"></div>
+            Tugas Hari Ini
+            <span style="font-size:11px;color:var(--text3);font-weight:600;margin-left:auto">Selasa, 6 Mei 2025</span>
+          </div>
+          <div class="task-item">
+            <div class="task-check" style="background:var(--green-l);border-color:var(--green);color:var(--green)"><i class="ti ti-check" style="font-size:11px"></i></div>
+            <div style="flex:1">
+              <div class="task-name done">Rekap laporan KIA bulan April</div>
+              <div style="font-size:11px;color:var(--text3)">Bidan Rani · Selesai 09.15</div>
+            </div>
+            <div class="chip" style="background:var(--green-l);color:var(--green-d)">Selesai</div>
+          </div>
+          <div class="task-item">
+            <div class="task-check" style="border-color:var(--blue)"></div>
+            <div style="flex:1">
+              <div class="task-name">Input data imunisasi minggu ini</div>
+              <div style="font-size:11px;color:var(--text3)">Perawat Dini · Due 14.00</div>
+            </div>
+            <div class="chip" style="background:var(--blue-l);color:var(--blue-d)">Proses</div>
+          </div>
+          <div class="task-item">
+            <div class="task-check" style="border-color:var(--orange)"></div>
+            <div style="flex:1">
+              <div class="task-name">Rapat koordinasi program PTM</div>
+              <div style="font-size:11px;color:var(--text3)">Semua tim · 13.00 - 14.00</div>
+            </div>
+            <div class="chip" style="background:var(--orange-l);color:var(--orange-d)">Pending</div>
+          </div>
+          <div class="task-item">
+            <div class="task-check" style="border-color:var(--red)"></div>
+            <div style="flex:1">
+              <div class="task-name">Laporan bulanan posyandu balita</div>
+              <div style="font-size:11px;color:var(--text3)">Bidan Sari · <span style="color:var(--red)">Terlambat 2 hari</span></div>
+            </div>
+            <div class="chip" style="background:var(--red-l);color:var(--red-d)">Overdue</div>
+          </div>
+          <div class="task-item">
+            <div class="task-check" style="border-color:var(--purple)"></div>
+            <div style="flex:1">
+              <div class="task-name">Verifikasi data sasaran program gizi</div>
+              <div style="font-size:11px;color:var(--text3)">Nutrisionis · Due 16.00</div>
+            </div>
+            <div class="chip" style="background:var(--purple-l);color:var(--purple-d)">Review</div>
+          </div>
+        </div>
+
+        <!-- CAPAIAN PROGRAM -->
+        <div class="card">
+          <div class="section-title"><div class="dot" style="background:var(--teal)"></div>Capaian Program Bulan Ini</div>
+          <div class="prog-item">
+            <div class="prog-header"><span>KIA (Kesehatan Ibu & Anak)</span><span style="color:var(--green)">92%</span></div>
+            <div class="prog-bar"><div class="prog-fill" style="width:92%;background:linear-gradient(90deg,#16a34a,#0d9488)"></div></div>
+          </div>
+          <div class="prog-item">
+            <div class="prog-header"><span>Imunisasi</span><span style="color:var(--blue)">85%</span></div>
+            <div class="prog-bar"><div class="prog-fill" style="width:85%;background:linear-gradient(90deg,#2563eb,#7c3aed)"></div></div>
+          </div>
+          <div class="prog-item">
+            <div class="prog-header"><span>Gizi Masyarakat</span><span style="color:var(--orange)">71%</span></div>
+            <div class="prog-bar"><div class="prog-fill" style="width:71%;background:linear-gradient(90deg,#ea580c,#d97706)"></div></div>
+          </div>
+          <div class="prog-item">
+            <div class="prog-header"><span>PTM (Penyakit Tidak Menular)</span><span style="color:var(--amber)">64%</span></div>
+            <div class="prog-bar"><div class="prog-fill" style="width:64%;background:linear-gradient(90deg,#d97706,#ea580c)"></div></div>
+          </div>
+          <div class="prog-item">
+            <div class="prog-header"><span>TB & Paru</span><span style="color:var(--red)">48%</span></div>
+            <div class="prog-bar"><div class="prog-fill" style="width:48%;background:linear-gradient(90deg,#dc2626,#db2777)"></div></div>
+          </div>
+          <div class="prog-item">
+            <div class="prog-header"><span>Kesehatan Lingkungan</span><span style="color:var(--teal)">88%</span></div>
+            <div class="prog-bar"><div class="prog-fill" style="width:88%;background:linear-gradient(90deg,#0d9488,#2563eb)"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AKTIVITAS TERBARU -->
+      <div class="card">
+        <div class="section-title"><div class="dot" style="background:var(--purple)"></div>Aktivitas Terbaru Tim</div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0">
+          <div class="activity-item">
+            <div class="act-dot" style="background:var(--green-l);color:var(--green)"><i class="ti ti-check"></i></div>
+            <div><div class="act-text">Bidan Rani menyelesaikan rekap KIA April</div><div class="act-time">Hari ini, 09:15</div></div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot" style="background:var(--blue-l);color:var(--blue)"><i class="ti ti-file-plus"></i></div>
+            <div><div class="act-text">dr. Sari menambah tugas verifikasi data PTM</div><div class="act-time">Hari ini, 08:42</div></div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot" style="background:var(--orange-l);color:var(--orange)"><i class="ti ti-message"></i></div>
+            <div><div class="act-text">Perawat Dini mengirim komentar laporan imunisasi</div><div class="act-time">Kemarin, 16:20</div></div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot" style="background:var(--purple-l);color:var(--purple)"><i class="ti ti-chart-bar"></i></div>
+            <div><div class="act-text">Capaian program Kesehatan Lingkungan diperbarui</div><div class="act-time">Kemarin, 14:05</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-dash -->
+
+    <!-- ==================== MANAJEMEN TUGAS ==================== -->
+    <div class="page" id="page-tugas">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div>
+          <div style="font-size:11px;color:var(--text3);font-weight:600;margin-bottom:2px">Periode: Mei 2025</div>
+          <div style="font-size:13px;font-weight:700;color:var(--text)">24 tugas aktif · 5 overdue · 18 selesai bulan ini</div>
+        </div>
+        <button style="background:linear-gradient(135deg,#16a34a,#0d9488);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px">
+          <i class="ti ti-plus"></i> Tambah Tugas
+        </button>
+      </div>
+
+      <div class="filter-bar">
+        <span style="font-size:12px;font-weight:700;color:var(--text2)">Filter:</span>
+        <button class="filter-chip active">Semua</button>
+        <button class="filter-chip">KIA</button>
+        <button class="filter-chip">Imunisasi</button>
+        <button class="filter-chip">Gizi</button>
+        <button class="filter-chip">PTM</button>
+        <button class="filter-chip">TB & Paru</button>
+        <div style="margin-left:auto;display:flex;gap:8px">
+          <button class="filter-chip"><i class="ti ti-filter" style="font-size:13px;vertical-align:-1px"></i> Filter lanjut</button>
+          <button class="filter-chip"><i class="ti ti-sort-ascending" style="font-size:13px;vertical-align:-1px"></i> Urutan</button>
+        </div>
+      </div>
+
+      <div class="kanban">
+        <!-- TODO -->
+        <div class="kanban-col">
+          <div class="col-header">
+            <div class="col-title"><span style="width:10px;height:10px;background:#94a3b8;border-radius:50%;display:inline-block"></span>Belum Mulai</div>
+            <span class="col-count">6</span>
+          </div>
+          <div class="task-card">
+            <div class="prio-bar" style="background:var(--red-l)"><div style="width:100%;height:3px;background:var(--red);border-radius:3px"></div></div>
+            <div class="task-card-title">Laporan bulanan posyandu balita</div>
+            <div class="task-card-meta">
+              <span class="tag" style="background:var(--red-l);color:var(--red-d)">KIA</span>
+              <span class="tag" style="background:#f1f5f9;color:var(--text2)">Tinggi</span>
+              <div class="assignee-list"><div class="av" style="background:var(--pink-l);color:var(--pink-d)">BS</div></div>
+            </div>
+            <div class="task-card-due"><i class="ti ti-calendar" style="font-size:12px;color:var(--red)"></i><span style="color:var(--red)">Overdue — 4 Mei</span></div>
+          </div>
+          <div class="task-card">
+            <div class="prio-bar" style="background:var(--orange-l)"><div style="width:100%;height:3px;background:var(--orange);border-radius:3px"></div></div>
+            <div class="task-card-title">Rekap kunjungan lansia bulan April</div>
+            <div class="task-card-meta">
+              <span class="tag" style="background:var(--purple-l);color:var(--purple-d)">PTM</span>
+              <span class="tag" style="background:#f1f5f9;color:var(--text2)">Sedang</span>
+              <div class="assignee-list"><div class="av" style="background:var(--blue-l);color:var(--blue-d)">PD</div><div class="av" style="background:var(--green-l);color:var(--green-d)">SW</div></div>
+            </div>
+            <div class="task-card-due"><i class="ti ti-calendar" style="font-size:12px"></i>8 Mei 2025</div>
+          </div>
+          <div class="task-card">
+            <div class="prio-bar" style="background:var(--amber-l)"><div style="width:60%;height:3px;background:var(--amber);border-radius:3px"></div></div>
+            <div class="task-card-title">Pengajuan kebutuhan vaksin Juni</div>
+            <div class="task-card-meta">
+              <span class="tag" style="background:var(--blue-l);color:var(--blue-d)">Imunisasi</span>
+              <span class="tag" style="background:#f1f5f9;color:var(--text2)">Normal</span>
+              <div class="assignee-list"><div class="av" style="background:var(--teal-l);color:var(--teal-d)">NS</div></div>
+            </div>
+            <div class="task-card-due"><i class="ti ti-calendar" style="font-size:12px"></i>12 Mei 2025</div>
+          </div>
+          <button class="add-task-btn"><i class="ti ti-plus"></i> Tambah tugas</button>
+        </div>
+
+        <!-- IN PROGRESS -->
+        <div class="kanban-col" style="background:var(--blue-l)">
+          <div class="col-header">
+            <div class="col-title"><span style="width:10px;height:10px;background:var(--blue);border-radius:50%;display:inline-block"></span>Sedang Dikerjakan</div>
+            <span class="col-count" style="background:#bfdbfe;color:var(--blue-d)">5</span>
+          </div>
+          <div class="task-card">
+            <div class="prio-bar"><div style="width:100%;height:3px;background:var(--orange);border-radius:3px"></div></div>
+            <div class="task-card-title">Input data imunisasi minggu ke-2</div>
+            <div style="background:var(--blue-l);border-radius:6px;padding:6px 8px;margin-bottom:8px">
+              <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--blue-d);margin-bottom:4px"><span>Progress</span><span>65%</span></div>
+              <div style="background:#bfdbfe;border-radius:20px;height:5px"><div style="width:65%;background:var(--blue);height:5px;border-radius:20px"></div></div>
+            </div>
+            <div class="task-card-meta">
+              <span class="tag" style="background:var(--blue-l);color:var(--blue-d)">Imunisasi</span>
+              <div class="assignee-list"><div class="av" style="background:var(--blue-l);color:var(--blue-d)">PD</div></div>
+            </div>
+            <div class="task-card-due"><i class="ti ti-calendar" style="font-size:12px"></i>6 Mei 2025 · Due hari ini</div>
+          </div>
+          <div class="task-card">
+            <div class="prio-bar"><div style="width:100%;height:3px;background:var(--green);border-radius:3px"></div></div>
+            <div class="task-card-title">Verifikasi data sasaran program gizi</div>
+            <div style="background:#f0fdf4;border-radius:6px;padding:6px 8px;margin-bottom:8px">
+              <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--green-d);margin-bottom:4px"><span>Progress</span><span>40%</span></div>
+              <div style="background:#bbf7d0;border-radius:20px;height:5px"><div style="width:40%;background:var(--green);height:5px;border-radius:20px"></div></div>
+            </div>
+            <div class="task-card-meta">
+              <span class="tag" style="background:var(--green-l);color:var(--green-d)">Gizi</span>
+              <div class="assignee-list"><div class="av" style="background:var(--orange-l);color:var(--orange-d)">NR</div><div class="av" style="background:var(--purple-l);color:var(--purple-d)">HS</div></div>
+            </div>
+            <div class="task-card-due"><i class="ti ti-calendar" style="font-size:12px"></i>7 Mei 2025</div>
+          </div>
+          <button class="add-task-btn" style="border-color:#bfdbfe"><i class="ti ti-plus"></i> Tambah tugas</button>
+        </div>
+
+        <!-- DONE -->
+        <div class="kanban-col" style="background:var(--green-l)">
+          <div class="col-header">
+            <div class="col-title"><span style="width:10px;height:10px;background:var(--green);border-radius:50%;display:inline-block"></span>Selesai</div>
+            <span class="col-count" style="background:#bbf7d0;color:var(--green-d)">13</span>
+          </div>
+          <div class="task-card">
+            <div class="prio-bar"><div style="width:100%;height:3px;background:var(--green);border-radius:3px"></div></div>
+            <div class="task-card-title">Rekap laporan KIA bulan April</div>
+            <div class="task-card-meta">
+              <span class="tag" style="background:var(--green-l);color:var(--green-d)">KIA</span>
+              <div class="assignee-list"><div class="av" style="background:var(--pink-l);color:var(--pink-d)">BR</div></div>
+            </div>
+            <div class="task-card-due"><i class="ti ti-check" style="font-size:12px;color:var(--green)"></i><span style="color:var(--green)">Selesai — 6 Mei 09:15</span></div>
+          </div>
+          <div class="task-card">
+            <div class="prio-bar"><div style="width:100%;height:3px;background:var(--green);border-radius:3px"></div></div>
+            <div class="task-card-title">Pembinaan kader posyandu wilayah timur</div>
+            <div class="task-card-meta">
+              <span class="tag" style="background:var(--teal-l);color:var(--teal-d)">Kesling</span>
+              <div class="assignee-list"><div class="av" style="background:var(--green-l);color:var(--green-d)">SW</div><div class="av" style="background:var(--blue-l);color:var(--blue-d)">DS</div></div>
+            </div>
+            <div class="task-card-due"><i class="ti ti-check" style="font-size:12px;color:var(--green)"></i><span style="color:var(--green)">Selesai — 5 Mei</span></div>
+          </div>
+          <div class="task-card">
+            <div class="prio-bar"><div style="width:100%;height:3px;background:var(--green);border-radius:3px"></div></div>
+            <div class="task-card-title">Update target capaian TB bulan Mei</div>
+            <div class="task-card-meta">
+              <span class="tag" style="background:var(--red-l);color:var(--red-d)">TB & Paru</span>
+              <div class="assignee-list"><div class="av" style="background:var(--amber-l);color:var(--amber-d)">FH</div></div>
+            </div>
+            <div class="task-card-due"><i class="ti ti-check" style="font-size:12px;color:var(--green)"></i><span style="color:var(--green)">Selesai — 4 Mei</span></div>
+          </div>
+          <button class="add-task-btn" style="border-color:#bbf7d0"><i class="ti ti-plus"></i> Tambah tugas</button>
+        </div>
+      </div>
+    </div><!-- /page-tugas -->
+
+    <!-- ==================== EVALUASI CAPAIAN ==================== -->
+    <div class="page" id="page-eval">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div>
+          <div style="font-size:11px;color:var(--text3);font-weight:600;margin-bottom:2px">Tahun 2025 · Puskesmas Jumpandang Baru</div>
+          <div style="font-size:13px;font-weight:700">Klik kartu program untuk melihat detail capaian</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="filter-chip active">Semua Program</button>
+          <button class="filter-chip">2025</button>
+          <button class="filter-chip"><i class="ti ti-download" style="font-size:13px;vertical-align:-1px"></i> Export</button>
+        </div>
+      </div>
+
+      <div class="eval-grid">
+        <div class="prog-card" style="background:var(--green-l);color:var(--green-d)" onclick="selectProg(this,'green')" id="pc-kia">
+          <div style="font-size:22px;margin-bottom:6px"><i class="ti ti-heart-plus"></i></div>
+          <div class="prog-card-title">KIA</div>
+          <div class="prog-card-sub">Kesehatan Ibu & Anak</div>
+          <div class="prog-card-pct">92%</div>
+          <div style="background:rgba(0,0,0,.08);border-radius:20px;height:6px;margin-bottom:6px"><div style="width:92%;background:currentColor;height:6px;border-radius:20px;opacity:.7"></div></div>
+          <div class="prog-card-mini">Target: 360 · Tercapai: 331</div>
+        </div>
+        <div class="prog-card" style="background:var(--blue-l);color:var(--blue-d)" onclick="selectProg(this,'blue')" id="pc-imun">
+          <div style="font-size:22px;margin-bottom:6px"><i class="ti ti-vaccine"></i></div>
+          <div class="prog-card-title">Imunisasi</div>
+          <div class="prog-card-sub">Program Imunisasi Dasar</div>
+          <div class="prog-card-pct">85%</div>
+          <div style="background:rgba(0,0,0,.08);border-radius:20px;height:6px;margin-bottom:6px"><div style="width:85%;background:currentColor;height:6px;border-radius:20px;opacity:.7"></div></div>
+          <div class="prog-card-mini">Target: 420 · Tercapai: 357</div>
+        </div>
+        <div class="prog-card" style="background:var(--orange-l);color:var(--orange-d)" onclick="selectProg(this,'orange')" id="pc-gizi">
+          <div style="font-size:22px;margin-bottom:6px"><i class="ti ti-apple"></i></div>
+          <div class="prog-card-title">Gizi</div>
+          <div class="prog-card-sub">Gizi Masyarakat</div>
+          <div class="prog-card-pct">71%</div>
+          <div style="background:rgba(0,0,0,.08);border-radius:20px;height:6px;margin-bottom:6px"><div style="width:71%;background:currentColor;height:6px;border-radius:20px;opacity:.7"></div></div>
+          <div class="prog-card-mini">Target: 280 · Tercapai: 199</div>
+        </div>
+        <div class="prog-card" style="background:var(--purple-l);color:var(--purple-d)" onclick="selectProg(this,'purple')" id="pc-ptm">
+          <div style="font-size:22px;margin-bottom:6px"><i class="ti ti-stethoscope"></i></div>
+          <div class="prog-card-title">PTM</div>
+          <div class="prog-card-sub">Penyakit Tidak Menular</div>
+          <div class="prog-card-pct">64%</div>
+          <div style="background:rgba(0,0,0,.08);border-radius:20px;height:6px;margin-bottom:6px"><div style="width:64%;background:currentColor;height:6px;border-radius:20px;opacity:.7"></div></div>
+          <div class="prog-card-mini">Target: 500 · Tercapai: 320</div>
+        </div>
+        <div class="prog-card" style="background:var(--red-l);color:var(--red-d)" onclick="selectProg(this,'red')" id="pc-tb">
+          <div style="font-size:22px;margin-bottom:6px"><i class="ti ti-lungs"></i></div>
+          <div class="prog-card-title">TB & Paru</div>
+          <div class="prog-card-sub">Tuberkulosis & Penyakit Paru</div>
+          <div class="prog-card-pct">48%</div>
+          <div style="background:rgba(0,0,0,.08);border-radius:20px;height:6px;margin-bottom:6px"><div style="width:48%;background:currentColor;height:6px;border-radius:20px;opacity:.7"></div></div>
+          <div class="prog-card-mini">Target: 150 · Tercapai: 72</div>
+        </div>
+        <div class="prog-card" style="background:var(--teal-l);color:var(--teal-d)" onclick="selectProg(this,'teal')" id="pc-kesling">
+          <div style="font-size:22px;margin-bottom:6px"><i class="ti ti-leaf"></i></div>
+          <div class="prog-card-title">Kesling</div>
+          <div class="prog-card-sub">Kesehatan Lingkungan</div>
+          <div class="prog-card-pct">88%</div>
+          <div style="background:rgba(0,0,0,.08);border-radius:20px;height:6px;margin-bottom:6px"><div style="width:88%;background:currentColor;height:6px;border-radius:20px;opacity:.7"></div></div>
+          <div class="prog-card-mini">Target: 200 · Tercapai: 176</div>
+        </div>
+      </div>
+
+      <!-- DETAIL SECTION -->
+      <div class="detail-grid">
+        <div class="card">
+          <div class="section-title"><div class="dot" id="detail-dot" style="background:var(--green)"></div><span id="detail-title">Detail Capaian — KIA (Kesehatan Ibu & Anak)</span></div>
+          <table class="month-table">
+            <thead>
+              <tr><th>Indikator</th><th>Target</th><th>Tercapai</th><th>%</th><th>Status</th></tr>
+            </thead>
+            <tbody id="detail-tbody">
+              <tr><td>Kunjungan K1</td><td>80</td><td>78</td><td>97%</td><td><span class="status-pill" style="background:var(--green-l);color:var(--green-d)"><i class="ti ti-check" style="font-size:10px"></i> Tercapai</span></td></tr>
+              <tr><td>Kunjungan K4</td><td>75</td><td>70</td><td>93%</td><td><span class="status-pill" style="background:var(--green-l);color:var(--green-d)"><i class="ti ti-check" style="font-size:10px"></i> Tercapai</span></td></tr>
+              <tr><td>Persalinan Nakes</td><td>70</td><td>65</td><td>93%</td><td><span class="status-pill" style="background:var(--green-l);color:var(--green-d)"><i class="ti ti-check" style="font-size:10px"></i> Tercapai</span></td></tr>
+              <tr><td>Kunjungan Neonatal</td><td>65</td><td>62</td><td>95%</td><td><span class="status-pill" style="background:var(--green-l);color:var(--green-d)"><i class="ti ti-check" style="font-size:10px"></i> Tercapai</span></td></tr>
+              <tr><td>KB Aktif</td><td>70</td><td>56</td><td>80%</td><td><span class="status-pill" style="background:var(--amber-l);color:var(--amber-d)"><i class="ti ti-alert-triangle" style="font-size:10px"></i> Menuju</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card">
+          <div class="section-title"><div class="dot" id="chart-dot" style="background:var(--green)"></div><span id="chart-title">Tren Capaian Jan–Mei 2025</span></div>
+          <div class="mini-chart" id="mini-chart"></div>
+          <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+            <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">Ringkasan</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div style="background:#f8fafc;border-radius:8px;padding:10px 12px">
+                <div style="font-size:10px;font-weight:700;color:var(--text3)">Total Target</div>
+                <div id="sum-target" style="font-size:18px;font-weight:800;color:var(--text)">360</div>
+              </div>
+              <div style="background:#f8fafc;border-radius:8px;padding:10px 12px">
+                <div style="font-size:10px;font-weight:700;color:var(--text3)">Tercapai</div>
+                <div id="sum-actual" style="font-size:18px;font-weight:800;">331</div>
+              </div>
+              <div style="background:#f8fafc;border-radius:8px;padding:10px 12px">
+                <div style="font-size:10px;font-weight:700;color:var(--text3)">Persentase</div>
+                <div id="sum-pct" style="font-size:18px;font-weight:800;">92%</div>
+              </div>
+              <div style="background:#f8fafc;border-radius:8px;padding:10px 12px">
+                <div style="font-size:10px;font-weight:700;color:var(--text3)">Status</div>
+                <div id="sum-status" style="font-size:13px;font-weight:800;color:var(--green)">On Track</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-eval -->
+
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>
