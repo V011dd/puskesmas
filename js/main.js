@@ -168,52 +168,141 @@ renderChart([65, 70, 75, 82, 92], '#16a34a');
 document.getElementById('pc-kia').style.borderColor = 'currentColor';
 document.getElementById('pc-kia').classList.add('selected');
 
-// ===== LOGIKA MODAL TAMBAH TUGAS =====
+// ===== DATABASE / STATE SEMENTARA =====
+// Mengambil data awal dari progData yang sudah ada di main.js kamu, atau membuat baru
+let currentProgData = { ...progData }; 
 
-// 1. Fungsi membuka modal
+// ===== FUNGSI MODAL =====
 function openTaskModal() {
   document.getElementById('task-modal').style.display = 'flex';
 }
 
-// 2. Fungsi menutup modal
 function closeTaskModal() {
   document.getElementById('task-modal').style.display = 'none';
-  document.getElementById('task-form').reset(); // Reset form inputan
+  document.getElementById('task-form').reset();
 }
 
-// 3. Fungsi menyimpan tugas baru dan menampilkannya di halaman
+// ===== UTAMA: SINKRONISASI DATA =====
 function saveTask(event) {
-  event.preventDefault(); // Mencegah halaman reload saat form di-submit
+  event.preventDefault();
 
-  // Ambil nilai dari inputan form
+  // 1. Ambil data dari Form Input
   const taskName = document.getElementById('task-name').value;
-  const taskDesc = document.getElementById('task-desc').value;
-  const taskPic  = document.getElementById('task-pic').value;
+  const programKey = document.getElementById('task-program').value;
+  const targetVal = parseInt(document.getElementById('report-target').value);
+  const actualVal = parseInt(document.getElementById('report-actual').value);
+  const taskPic = document.getElementById('task-pic').value;
 
-  // Dapatkan elemen kontainer daftar tugas (sesuaikan ID ini dengan kontainer tugas di HTML Anda)
-  // Umumnya kontainer di tugas menggunakan kelas seperti .task-grid atau sejenisnya
-  const taskContainer = document.querySelector('#page-tugas .task-grid') || document.querySelector('#page-tugas');
+  // Hitung persentase capaian baru untuk tugas ini
+  const pct = Math.round((actualVal / targetVal) * 100);
+  const initials = taskPic.split(' ').map(w => w[0]).join('').toUpperCase().substring(0, 2);
 
-  if (!taskContainer) {
-    alert("Kontainer tugas tidak ditemukan di HTML!");
-    return;
+  // ==========================================
+  // SINKRONISASI 1: KE PAGE MANAJEMEN TUGAS
+  // ==========================================
+  const taskContainer = document.querySelector('#page-tugas .kanban-col:last-child'); // Kolom "Selesai"
+  if (taskContainer) {
+    const newTaskHTML = `
+      <div class="task-card">
+        <div class="prio-bar"><div style="width:100%;height:3px;background:var(--green);border-radius:3px"></div></div>
+        <div class="task-card-title">${taskName}</div>
+        <div style="font-size:11px; color:var(--text2); margin: 4px 0 8px;">
+          Target: <strong>${targetVal}</strong> | Realisasi: <strong>${actualVal}</strong> (<strong>${pct}%</strong>)
+        </div>
+        <div class="task-card-meta">
+          <span class="tag" style="background:var(--green-l);color:var(--green-d)">Selesai</span>
+          <div class="assignee-list">
+            <div class="av" style="background:var(--teal-l);color:var(--teal-d)" title="${taskPic}">${initials}</div>
+          </div>
+        </div>
+        <div class="task-card-due"><i class="ti ti-check" style="font-size:12px;color:var(--green)"></i><span style="color:var(--green)">Selesai — Baru saja</span></div>
+      </div>
+    `;
+    
+    // Masukkan kartu sebelum tombol "Tambah Tugas" di kolom Selesai
+    const addBtn = taskContainer.querySelector('.add-task-btn');
+    if (addBtn) {
+      addBtn.insertAdjacentHTML('beforebegin', newTaskHTML);
+    } else {
+      taskContainer.insertAdjacentHTML('beforeend', newTaskHTML);
+    }
+
+    // Update counter kolom Selesai
+    const countSpan = taskContainer.querySelector('.col-count');
+    if (countSpan) {
+      countSpan.textContent = parseInt(countSpan.textContent) + 1;
+    }
   }
 
-  // Template HTML untuk kartu tugas baru (sesuaikan dengan desain kartu tugas yang kamu inginkan)
-  const newTaskHTML = `
-    <div class="task-card" style="background:#fff; border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05)">
-      <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:10px;">
-        <span class="status-pill" style="background:var(--purple-l); color:var(--purple-d)">Baru</span>
-        <span style="font-size:11px; color:var(--text3); font-weight:600;"><i class="ti ti-user"></i> ${taskPic}</span>
+  // ==========================================
+  // SINKRONISASI 2: KE PAGE EVALUASI CAPAIAN
+  // ==========================================
+  // Update data program di object progData
+  if (currentProgData[programKey]) {
+    // Tambahkan target dan realisasi baru ke total program
+    currentProgData[programKey].target += targetVal;
+    currentProgData[programKey].actual += actualVal;
+    
+    // Hitung ulang persentase total program tersebut
+    const newProgPct = Math.round((currentProgData[programKey].actual / currentProgData[programKey].target) * 100);
+    currentProgData[programKey].pct = newProgPct;
+
+    // Tambahkan data ke baris tabel detail
+    const statusPill = pct >= 80 ? 'ok' : (pct >= 50 ? 'warn' : 'danger');
+    currentProgData[programKey].rows.push([taskName, targetVal, actualVal, pct, statusPill]);
+
+    // Tambahkan tren bulan Mei (index ke-4) agar grafiknya naik secara visual
+    currentProgData[programKey].months[4] = Math.min(100, Math.round(currentProgData[programKey].months[4] + (pct * 0.1)));
+
+    // Update visual Kartu Evaluasi di UI secara instan
+    const cardId = `pc-${programKey}`;
+    const progCard = document.getElementById(cardId);
+    if (progCard) {
+      progCard.querySelector('.prog-card-pct').textContent = `${newProgPct}%`;
+      progCard.querySelector('.prog-card-mini').textContent = `Target: ${currentProgData[programKey].target} · Tercapai: ${currentProgData[programKey].actual}`;
+      progCard.querySelector('.prog-card-pct + div div').style.width = `${newProgPct}%`;
+    }
+  }
+
+  // ==========================================
+  // SINKRONISASI 3: KE PAGE DASHBOARD
+  // ==========================================
+  // A. Tambah ke Log "Aktivitas Terbaru" di Dashboard
+  const activityContainer = document.querySelector('#page-dash .card:last-child div[style*="grid-template-columns"]');
+  if (activityContainer) {
+    const newActivityHTML = `
+      <div class="activity-item">
+        <div class="act-dot" style="background:var(--green-l);color:var(--green)"><i class="ti ti-file-analytics"></i></div>
+        <div>
+          <div class="act-text"><strong>${taskPic}</strong> menginput laporan: "${taskName}" (${pct}%)</div>
+          <div class="act-time">Baru saja</div>
+        </div>
       </div>
-      <h4 style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:6px;">${taskName}</h4>
-      <p style="font-size:12px; color:var(--text2); line-height:1.5;">${taskDesc || 'Tidak ada deskripsi.'}</p>
-    </div>
-  `;
+    `;
+    activityContainer.insertAdjacentHTML('afterbegin', newActivityHTML);
+  }
 
-  // Sisipkan tugas baru ke dalam kontainer
-  taskContainer.insertAdjacentHTML('beforeend', newTaskHTML);
+  // B. Update total tugas aktif di statistik Dashboard
+  const totalTaskVal = document.querySelector('.stat-card:first-child .stat-val');
+  if (totalTaskVal) {
+    totalTaskVal.textContent = parseInt(totalTaskVal.textContent) + 1;
+  }
 
-  // Tutup modal dan reset form
+  // C. Update Rata-rata Capaian seluruh program di Dashboard
+  let totalPctSum = 0;
+  let countProgs = 0;
+  for (let key in currentProgData) {
+    totalPctSum += currentProgData[key].pct;
+    countProgs++;
+  }
+  const avgCapaianVal = document.querySelectorAll('.stat-card')[2]?.querySelector('.stat-val');
+  if (avgCapaianVal && countProgs > 0) {
+    avgCapaianVal.textContent = `${Math.round(totalPctSum / countProgs)}%`;
+  }
+
+  // ==========================================
+  // SELESAI
+  // ==========================================
   closeTaskModal();
+  alert(`Laporan "${taskName}" berhasil disinkronkan ke semua halaman!`);
 }
