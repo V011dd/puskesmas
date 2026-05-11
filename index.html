@@ -533,45 +533,63 @@
 <div id="task-modal" class="modal-backdrop" style="display: none;">
   <div class="modal-content">
     <div class="modal-header">
-      <h3>Tambah Tugas & Laporan Program</h3>
+      <h3>Tambah Tugas / Laporan</h3>
       <button onclick="closeTaskModal()" class="btn-close">&times;</button>
     </div>
     <form id="task-form" onsubmit="saveTask(event)">
       <div class="form-group">
-        <label for="task-name">Nama Tugas / Laporan</label>
-        <input type="text" id="task-name" required placeholder="Contoh: Laporan Kunjungan Balita Mei">
+        <label for="task-name">Nama Tugas / Kegiatan</label>
+        <input type="text" id="task-name" required placeholder="Contoh: Pemantauan Gizi Balita Melur">
       </div>
       
       <div class="form-group">
-        <label for="task-program">Pilih Kategori Program</label>
-        <select id="task-program" required style="width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--font); font-size: 13px; outline: none;">
-          <option value="kia">Ibu Hamil (KIA)</option>
-          <option value="imun">Ibu Bersalin</option>
-          <option value="gizi">Bayi Baru Lahir</option>
-          <option value="ptm">Balita</option>
-          <option value="tb">TB</option>
-        </select>
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-        <div class="form-group">
-          <label for="report-target">Target Sasaran</label>
-          <input type="number" id="report-target" required placeholder="Contoh: 100">
-        </div>
-        <div class="form-group">
-          <label for="report-actual">Realisasi Capaian</label>
-          <input type="number" id="report-actual" required placeholder="Contoh: 85">
-        </div>
+        <label for="task-desc">Deskripsi Tugas</label>
+        <textarea id="task-desc" rows="2" placeholder="Deskripsi detail tugas (opsional)..."></textarea>
       </div>
 
       <div class="form-group">
         <label for="task-pic">Penanggung Jawab</label>
-        <input type="text" id="task-pic" required placeholder="Nama penanggung jawab (Bidan/Perawat)">
+        <input type="text" id="task-pic" required placeholder="Nama penanggung jawab">
       </div>
 
-      <div class="form-actions">
+      <div class="form-group">
+        <label for="task-status">Status Tugas</label>
+        <select id="task-status" onchange="toggleReportFields()" required style="width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--font); font-size: 13px; outline: none; background: #fff;">
+          <option value="todo">Belum Mulai</option>
+          <option value="progress">Sedang Dikerjakan</option>
+          <option value="done">Selesai (Input Laporan & Sinkronisasi)</option>
+        </select>
+      </div>
+
+      <div id="report-fields-wrapper" style="display: none; border-top: 2px dashed var(--border); padding-top: 14px; margin-top: 14px;">
+        <h4 style="font-size: 13px; font-weight: 800; color: var(--teal-d); margin-bottom: 12px;"><i class="ti ti-file-analytics"></i> Data Laporan Program</h4>
+        
+        <div class="form-group">
+          <label for="task-program">Kategori Program Capaian</label>
+          <select id="task-program" style="width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--font); font-size: 13px; outline: none; background: #fff;">
+            <option value="kia">Ibu Hamil (KIA)</option>
+            <option value="imun">Ibu Bersalin</option>
+            <option value="gizi">Bayi Baru Lahir</option>
+            <option value="ptm">Balita</option>
+            <option value="tb">TB</option>
+          </select>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label for="report-target">Target Sasaran</label>
+            <input type="number" id="report-target" placeholder="Contoh: 100">
+          </div>
+          <div class="form-group">
+            <label for="report-actual">Realisasi Capaian</label>
+            <input type="number" id="report-actual" placeholder="Contoh: 85">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions" style="margin-top: 20px;">
         <button type="button" onclick="closeTaskModal()" class="btn-secondary">Batal</button>
-        <button type="submit" class="btn-primary">Simpan & Sinkronkan</button>
+        <button type="submit" class="btn-primary">Simpan Tugas</button>
       </div>
     </form>
   </div>
