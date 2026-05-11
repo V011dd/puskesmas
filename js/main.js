@@ -167,3 +167,53 @@ function renderChart(vals, color) {
 renderChart([65, 70, 75, 82, 92], '#16a34a');
 document.getElementById('pc-kia').style.borderColor = 'currentColor';
 document.getElementById('pc-kia').classList.add('selected');
+
+// ===== LOGIKA MODAL TAMBAH TUGAS =====
+
+// 1. Fungsi membuka modal
+function openTaskModal() {
+  document.getElementById('task-modal').style.display = 'flex';
+}
+
+// 2. Fungsi menutup modal
+function closeTaskModal() {
+  document.getElementById('task-modal').style.display = 'none';
+  document.getElementById('task-form').reset(); // Reset form inputan
+}
+
+// 3. Fungsi menyimpan tugas baru dan menampilkannya di halaman
+function saveTask(event) {
+  event.preventDefault(); // Mencegah halaman reload saat form di-submit
+
+  // Ambil nilai dari inputan form
+  const taskName = document.getElementById('task-name').value;
+  const taskDesc = document.getElementById('task-desc').value;
+  const taskPic  = document.getElementById('task-pic').value;
+
+  // Dapatkan elemen kontainer daftar tugas (sesuaikan ID ini dengan kontainer tugas di HTML Anda)
+  // Umumnya kontainer di tugas menggunakan kelas seperti .task-grid atau sejenisnya
+  const taskContainer = document.querySelector('#page-tugas .task-grid') || document.querySelector('#page-tugas');
+
+  if (!taskContainer) {
+    alert("Kontainer tugas tidak ditemukan di HTML!");
+    return;
+  }
+
+  // Template HTML untuk kartu tugas baru (sesuaikan dengan desain kartu tugas yang kamu inginkan)
+  const newTaskHTML = `
+    <div class="task-card" style="background:#fff; border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05)">
+      <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:10px;">
+        <span class="status-pill" style="background:var(--purple-l); color:var(--purple-d)">Baru</span>
+        <span style="font-size:11px; color:var(--text3); font-weight:600;"><i class="ti ti-user"></i> ${taskPic}</span>
+      </div>
+      <h4 style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:6px;">${taskName}</h4>
+      <p style="font-size:12px; color:var(--text2); line-height:1.5;">${taskDesc || 'Tidak ada deskripsi.'}</p>
+    </div>
+  `;
+
+  // Sisipkan tugas baru ke dalam kontainer
+  taskContainer.insertAdjacentHTML('beforeend', newTaskHTML);
+
+  // Tutup modal dan reset form
+  closeTaskModal();
+}
