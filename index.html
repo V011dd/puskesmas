@@ -530,6 +530,32 @@
 
   </div>
 </div>
+  <div id="task-modal" class="modal-backdrop" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Tambah Tugas Baru</h3>
+      <button onclick="closeTaskModal()" class="btn-close">&times;</button>
+    </div>
+    <form id="task-form" onsubmit="saveTask(event)">
+      <div class="form-group">
+        <label for="task-name">Nama Tugas</label>
+        <input type="text" id="task-name" required placeholder="Contoh: Pemantauan Gizi Balita">
+      </div>
+      <div class="form-group">
+        <label for="task-desc">Deskripsi Tugas</label>
+        <textarea id="task-desc" rows="3" placeholder="Deskripsi detail tugas..."></textarea>
+      </div>
+      <div class="form-group">
+        <label for="task-pic">Penanggung Jawab</label>
+        <input type="text" id="task-pic" required placeholder="Nama penanggung jawab">
+      </div>
+      <div class="form-actions">
+        <button type="button" onclick="closeTaskModal()" class="btn-secondary">Batal</button>
+        <button type="submit" class="btn-primary">Simpan Tugas</button>
+      </div>
+    </form>
+  </div>
+</div>
 
 <script src="js/main.js"></script>
 </body>
