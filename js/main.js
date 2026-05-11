@@ -171,18 +171,23 @@ function renderChart(vals, color) {
     </div>`).join('');
 }
 
-// ===== LOGIKA MODAL TAMBAH TUGAS DENGAN STATUS KONDISIONAL =====
+// ===== LOGIKA MODAL TAMBAH & SELESAIKAN TUGAS =====
 
-// 1. Membuka Modal
+// ID unik pembantu untuk tugas-tugas baru
+let taskIdCounter = Date.now();
+
+// 1. Membuka Modal (Untuk Tugas Baru)
 function openTaskModal() {
   const modal = document.getElementById('task-modal');
   if (modal) {
+    document.getElementById('edit-task-id').value = ''; // Kosongkan ID edit karena ini tugas baru
+    document.getElementById('task-status').disabled = false; // Aktifkan pilihan status
     modal.style.display = 'flex';
-    toggleReportFields(); // Jalankan pengecekan status default saat terbuka
+    toggleReportFields();
   }
 }
 
-// 2. Menutup Modal & Reset Form
+// 2. Menutup Modal
 function closeTaskModal() {
   const modal = document.getElementById('task-modal');
   if (modal) modal.style.display = 'none';
@@ -199,12 +204,10 @@ function toggleReportFields() {
 
   if (statusSelect && reportWrapper) {
     if (statusSelect.value === 'done') {
-      // Jika statusnya Selesai, tampilkan input laporan & jadikan kolom tersebut wajib diisi (required)
       reportWrapper.style.display = 'block';
       if (targetInput) targetInput.required = true;
       if (actualInput) actualInput.required = true;
     } else {
-      // Jika Belum Mulai / Sedang Dikerjakan, sembunyikan input laporan & hapus required
       reportWrapper.style.display = 'none';
       if (targetInput) { targetInput.required = false; targetInput.value = ''; }
       if (actualInput) { actualInput.required = false; actualInput.value = ''; }
@@ -212,11 +215,37 @@ function toggleReportFields() {
   }
 }
 
-// 4. Menyimpan Tugas Sesuai dengan Kondisi Status yang Dipilih
+// 4. KHUSUS: Membuka Modal Laporan untuk Tugas yang Sudah Ada
+function openReportForTask(taskId) {
+  const taskCard = document.getElementById(taskId);
+  if (!taskCard) return;
+
+  // Ambil data dari kartu tugas yang lama
+  const taskName = taskCard.querySelector('.task-card-title').textContent;
+  const taskPic = taskCard.querySelector('.av').getAttribute('title') || '';
+
+  // Isi data tersebut ke dalam form modal
+  document.getElementById('edit-task-id').value = taskId; // Simpan ID kartu untuk dihapus nanti
+  document.getElementById('task-name').value = taskName;
+  document.getElementById('task-pic').value = taskPic;
+  
+  // Paksa status modal menjadi "Selesai" dan buka form input laporannya
+  const statusSelect = document.getElementById('task-status');
+  statusSelect.value = 'done';
+  statusSelect.disabled = true; // Kunci agar tidak bisa diubah kembali ke "todo/progress" saat proses ini
+
+  const modal = document.getElementById('task-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+    toggleReportFields();
+  }
+}
+
+// 5. Menyimpan Tugas & Sinkronisasi
 function saveTask(event) {
   event.preventDefault();
 
-  // Ambil value dasar dari form
+  const taskIdToEdit = document.getElementById('edit-task-id').value;
   const taskName = document.getElementById('task-name').value;
   const taskDesc = document.getElementById('task-desc').value;
   const taskPic = document.getElementById('task-pic').value;
@@ -224,17 +253,36 @@ function saveTask(event) {
 
   const initials = taskPic.split(' ').map(w => w[0]).join('').toUpperCase().substring(0, 2);
 
-  // =========================================================
-  // KONDISI A: TUGAS BELUM MULAI (TODO) / SEDANG DIKERJAKAN (PROGRESS)
-  // =========================================================
+  // Jika ini adalah proses "Menyelesaikan Tugas yang sudah ada", hapus kartu lamanya terlebih dahulu
+  if (taskIdToEdit) {
+    const oldCard = document.getElementById(taskIdToEdit);
+    if (oldCard) {
+      // Kurangi counter kolom asal sebelum kartunya dihapus
+      const parentCol = oldCard.closest('.kanban-col');
+      if (parentCol) {
+        const countSpan = parentCol.querySelector('.col-count');
+        if (countSpan) {
+          countSpan.textContent = Math.max(0, (parseInt(countSpan.textContent) || 0) - 1);
+        }
+      }
+      oldCard.remove(); // Hapus kartu lama dari kolom Belum Mulai / Sedang Dikerjakan
+    }
+  }
+
+  // Generate ID baru jika ini adalah pembuatan tugas dari awal
+  const currentTaskId = taskIdToEdit || 'task-' + (taskIdCounter++);
+
+  // ==========================================
+  // KONDISI A: SIMPAN SEBAGAI BELUM MULAI / SEDANG DIKERJAKAN
+  // ==========================================
   if (statusValue === 'todo' || statusValue === 'progress') {
-    let targetColSelector = '#page-tugas .kanban-col:first-child'; // Kolom Belum Mulai (todo)
+    let targetColSelector = '#page-tugas .kanban-col:first-child';
     let tagBg = '#f1f5f9';
     let tagColor = 'var(--text2)';
     let tagText = 'Belum Mulai';
 
     if (statusValue === 'progress') {
-      targetColSelector = '#page-tugas .kanban-col:nth-child(2)'; // Kolom Sedang Dikerjakan (progress)
+      targetColSelector = '#page-tugas .kanban-col:nth-child(2)';
       tagBg = 'var(--blue-l)';
       tagColor = 'var(--blue-d)';
       tagText = 'Proses';
@@ -243,9 +291,8 @@ function saveTask(event) {
     const targetColumn = document.querySelector(targetColSelector);
 
     if (targetColumn) {
-      // Buat HTML Kartu tugas biasa tanpa info laporan target/realisasi
       const newTaskHTML = `
-        <div class="task-card">
+        <div class="task-card" id="${currentTaskId}">
           <div class="prio-bar" style="background:${statusValue === 'progress' ? 'var(--orange)' : 'var(--amber)'}"><div style="width:100%;height:3px;background:currentColor;border-radius:3px"></div></div>
           <div class="task-card-title">${taskName}</div>
           ${taskDesc ? `<p style="font-size:12px; color:var(--text2); margin: 4px 0 8px; line-height:1.4;">${taskDesc}</p>` : ''}
@@ -255,11 +302,15 @@ function saveTask(event) {
               <div class="av" style="background:var(--teal-l);color:var(--teal-d)" title="${taskPic}">${initials}</div>
             </div>
           </div>
-          <div class="task-card-due"><i class="ti ti-calendar" style="font-size:12px"></i>Baru Dibuat</div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border)">
+            <span style="font-size:11px; color:var(--text3)"><i class="ti ti-calendar"></i> Aktif</span>
+            <button onclick="openReportForTask('${currentTaskId}')" style="background: var(--green-l); color: var(--green-d); border: none; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 3px;">
+              <i class="ti ti-checklist"></i> Selesaikan
+            </button>
+          </div>
         </div>
       `;
 
-      // Masukkan kartu ke kolom yang bersangkutan tepat di atas tombol "Tambah tugas"
       const addBtn = targetColumn.querySelector('.add-task-btn');
       if (addBtn) {
         addBtn.insertAdjacentHTML('beforebegin', newTaskHTML);
@@ -267,14 +318,13 @@ function saveTask(event) {
         targetColumn.insertAdjacentHTML('beforeend', newTaskHTML);
       }
 
-      // Update counter angka di atas kolom
       const countSpan = targetColumn.querySelector('.col-count');
       if (countSpan) {
         countSpan.textContent = (parseInt(countSpan.textContent) || 0) + 1;
       }
     }
 
-    // Beri info log aktivitas tim sederhana di Dashboard
+    // Buat log aktivitas di Dashboard
     const activityContainer = document.querySelector('#page-dash .card:last-child div[style*="grid-template-columns"]');
     if (activityContainer) {
       const logHTML = `
@@ -290,26 +340,25 @@ function saveTask(event) {
     }
 
     closeTaskModal();
-    alert(`Tugas "${taskName}" berhasil ditambahkan ke daftar kerja!`);
+    alert(`Tugas "${taskName}" berhasil ditambahkan ke daftar!`);
     return;
   }
 
-  // =========================================================
-  // KONDISI B: STATUS SELESAI (DONE) + SINKRONISASI DATA LAPORAN
-  // =========================================================
+  // ==========================================
+  // KONDISI B: SIMPAN SEBAGAI SELESAI + INPUT LAPORAN (SINKRONISASI)
+  // ==========================================
   if (statusValue === 'done') {
     const programKey = document.getElementById('task-program').value;
     const targetVal = parseInt(document.getElementById('report-target').value) || 0;
     const actualVal = parseInt(document.getElementById('report-actual').value) || 0;
 
-    // Hitung persentase capaian
     const pct = targetVal > 0 ? Math.round((actualVal / targetVal) * 100) : 0;
 
-    // 1. Sinkronisasi ke Kolom Kanban "Selesai"
+    // 1. Tambahkan kartu ke kolom Selesai
     const doneColumn = document.querySelector('#page-tugas .kanban-col:last-child');
     if (doneColumn) {
       const newTaskHTML = `
-        <div class="task-card">
+        <div class="task-card" id="${currentTaskId}">
           <div class="prio-bar"><div style="width:100%;height:3px;background:var(--green);border-radius:3px"></div></div>
           <div class="task-card-title">${taskName}</div>
           <div style="font-size:11px; color:var(--text2); margin: 4px 0 8px;">
@@ -338,7 +387,7 @@ function saveTask(event) {
       }
     }
 
-    // 2. Sinkronisasi ke Objek Data & Evaluasi Capaian Program
+    // 2. Sinkronisasi data ke Evaluasi Capaian
     if (progData[programKey]) {
       progData[programKey].target += targetVal;
       progData[programKey].actual += actualVal;
@@ -350,10 +399,8 @@ function saveTask(event) {
       const statusPillType = pct >= 80 ? 'ok' : (pct >= 50 ? 'warn' : 'bad');
       progData[programKey].rows.push([taskName, targetVal, actualVal, pct, statusPillType]);
 
-      // Dongkrak bulan terakhir (Mei) di tren grafik secara visual
       progData[programKey].months[4] = Math.min(100, Math.round(progData[programKey].months[4] + (pct * 0.05)));
 
-      // Perbarui visual kartu evaluasi di halaman langsung
       const progCard = document.getElementById(`pc-${programKey}`);
       if (progCard) {
         progCard.querySelector('.prog-card-pct').textContent = `${newProgPct}%`;
@@ -363,21 +410,21 @@ function saveTask(event) {
         if (fillBar) fillBar.style.width = `${newProgPct}%`;
       }
       
-      // Jika kartu ini sedang diseleksi, re-render tabel rincian secara langsung
       const activeCard = document.querySelector('.prog-card.selected');
       if (activeCard && activeCard.id === `pc-${programKey}`) {
         selectProg(activeCard);
       }
     }
 
-    // 3. Sinkronisasi Dashboard (Log & Statistik Rata-Rata Capaian)
+    // 3. Sinkronisasi Dashboard
     const activityContainer = document.querySelector('#page-dash .card:last-child div[style*="grid-template-columns"]');
     if (activityContainer) {
+      const actionText = taskIdToEdit ? 'menyelesaikan laporan tugas' : 'menginput laporan langsung';
       const logHTML = `
         <div class="activity-item">
           <div class="act-dot" style="background:var(--green-l);color:var(--green)"><i class="ti ti-file-analytics"></i></div>
           <div>
-            <div class="act-text"><strong>${taskPic}</strong> menginput laporan selesai: "${taskName}" (${pct}%)</div>
+            <div class="act-text"><strong>${taskPic}</strong> ${actionText}: "${taskName}" (${pct}%)</div>
             <div class="act-time">Baru saja</div>
           </div>
         </div>
