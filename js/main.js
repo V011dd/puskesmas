@@ -18,8 +18,8 @@ function goPage(p) {
   });
   document.getElementById('page-title').textContent = titles[p];
   if (p === 'eval') {
-    // Render grafik default (KIA) saat masuk ke page evaluasi
-    renderChart(progData.kia.months, progData.kia.color);
+    // Memperbaiki bug renderChart saat pindah halaman
+    renderChart(progData.kia.monthsVal, progData.kia.color, progData.kia.target);
   }
 }
 
@@ -36,11 +36,10 @@ let progData = {
   kia: {
     title: 'KIA (Kesehatan Ibu & Anak)',
     color: '#16a34a', dot: '#16a34a',
-    // Nilai awal capaian bulanan (misal: Jan=1500, Feb=1200, Mar=800, Apr=500, Mei=0)
     monthsVal: [1500, 1200, 800, 500, 0], 
-    target: 6000, // Target Tahunan Statis
-    actual: 4000, // Akumulasi realisasi awal (Jan-Apr)
-    pct: 67,      // (4000 / 6000) * 100%
+    target: 6000, 
+    actual: 4000, 
+    pct: 67,      
     status: 'On Track',
     rows: [
       ['Kunjungan K1 (Januari)',  6000, 1500, 25, 'warn'],
@@ -102,9 +101,8 @@ function renderChart(monthsVal, color, targetTotal) {
   const container = document.getElementById('mini-chart');
   if (!container) return;
 
-  // Konversi nilai riil bulanan menjadi persentase kontribusi terhadap target tahunan
   const percentages = monthsVal.map(val => Math.round((val / targetTotal) * 100));
-  const maxPct = Math.max(...percentages, 1); // Hindari pembagian dengan nol
+  const maxPct = Math.max(...percentages, 1); 
 
   container.innerHTML = percentages.map((p, i) => `
     <div class="bar-wrap">
@@ -157,6 +155,67 @@ function selectProg(el) {
 }
 
 // ===== LOGIKA INPUT TUGAS & AKUMULASI LAPORAN BULANAN =====
+
+// 1. Membuka Modal (Tugas Baru)
+function openTaskModal() {
+  const modal = document.getElementById('task-modal');
+  if (modal) {
+    document.getElementById('edit-task-id').value = ''; // Kosongkan ID edit
+    document.getElementById('task-status').disabled = false; // Aktifkan dropdown status
+    modal.style.display = 'flex';
+    toggleReportFields();
+  }
+}
+
+// 2. Menutup Modal
+function closeTaskModal() {
+  const modal = document.getElementById('task-modal');
+  if (modal) modal.style.display = 'none';
+  const form = document.getElementById('task-form');
+  if (form) form.reset();
+}
+
+// 3. Menampilkan/Menyembunyikan Form Laporan secara Dinamis
+function toggleReportFields() {
+  const statusSelect = document.getElementById('task-status');
+  const reportWrapper = document.getElementById('report-fields-wrapper');
+  const actualInput = document.getElementById('report-actual');
+
+  if (statusSelect && reportWrapper) {
+    if (statusSelect.value === 'done') {
+      reportWrapper.style.display = 'block';
+      if (actualInput) actualInput.required = true;
+    } else {
+      reportWrapper.style.display = 'none';
+      if (actualInput) { actualInput.required = false; actualInput.value = ''; }
+    }
+  }
+}
+
+// 4. PEMBENAHAN BUG: Fungsi Membuka Laporan dari Kartu yang Ada (Selesaikan)
+function openReportForTask(taskId) {
+  const taskCard = document.getElementById(taskId);
+  if (!taskCard) return;
+
+  const taskName = taskCard.querySelector('.task-card-title').textContent;
+  const taskPic = taskCard.querySelector('.av').getAttribute('title') || '';
+
+  document.getElementById('edit-task-id').value = taskId; // Simpan ID
+  document.getElementById('task-name').value = taskName;
+  document.getElementById('task-pic').value = taskPic;
+  
+  const statusSelect = document.getElementById('task-status');
+  statusSelect.value = 'done';
+  statusSelect.disabled = true; // Kunci status ke Selesai
+
+  const modal = document.getElementById('task-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+    toggleReportFields();
+  }
+}
+
+// 5. Menyimpan Tugas (Simpan Baru / Selesaikan)
 function saveTask(event) {
   event.preventDefault();
 
@@ -168,7 +227,7 @@ function saveTask(event) {
 
   const initials = taskPic.split(' ').map(w => w[0]).join('').toUpperCase().substring(0, 2);
 
-  // Hapus tugas lama jika merupakan proses transisi dari 'Belum Mulai'/'Proses' ke 'Selesai'
+  // Hapus tugas lama jika merupakan proses transisi
   if (taskIdToEdit) {
     const oldCard = document.getElementById(taskIdToEdit);
     if (oldCard) {
@@ -184,7 +243,7 @@ function saveTask(event) {
   const currentTaskId = taskIdToEdit || 'task-' + Date.now();
 
   // =========================================================
-  // KONDISI A: TUGAS BELUM MULAI / SEDANG PROSES (TIDAK ADA INPUT AKUMULASI LAPORAN)
+  // KONDISI A: TUGAS BELUM MULAI / SEDANG PROSES
   // =========================================================
   if (statusValue === 'todo' || statusValue === 'progress') {
     let targetColSelector = statusValue === 'todo' ? '#page-tugas .kanban-col:first-child' : '#page-tugas .kanban-col:nth-child(2)';
@@ -232,21 +291,15 @@ function saveTask(event) {
 
     const prog = progData[programKey];
     if (prog) {
-      // 1. Akumulasikan realisasi bulanan baru ke total realisasi program
       prog.actual += actualVal;
-      
-      // 2. Masukkan realisasi ke bulan yang dipilih pada array tren grafik
       prog.monthsVal[monthIndex] += actualVal;
 
-      // 3. Hitung ulang persentase total terhadap Target Tahunan yang tetap (statis)
       const newProgPct = Math.round((prog.actual / prog.target) * 100);
       prog.pct = newProgPct;
       prog.status = newProgPct >= 80 ? 'On Track' : (newProgPct >= 50 ? 'Butuh Perhatian' : 'Kritis');
 
-      // 4. Hitung kontribusi penginputan laporan ini terhadap target setahun
       const contributionPct = Math.round((actualVal / prog.target) * 100);
 
-      // 5. Tambahkan baris baru ke dalam tabel rincian evaluasi
       const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei'];
       const currentMonthName = monthNames[monthIndex];
       const statusPillType = contributionPct >= 10 ? 'ok' : (contributionPct >= 5 ? 'warn' : 'bad');
@@ -254,7 +307,6 @@ function saveTask(event) {
       prog.rows.push([`${taskName} (${currentMonthName})`, prog.target, actualVal, contributionPct, statusPillType]);
 
       // --- SINKRONISASI VISUAL KANBAN TUGAS ---
-      // Logika upload file simulasi
       const fileInput = document.getElementById('report-file');
       let fileHTML = '';
       if (fileInput && fileInput.files && fileInput.files.length > 0) {
@@ -301,7 +353,6 @@ function saveTask(event) {
         if (fillBar) fillBar.style.width = `${newProgPct}%`;
       }
 
-      // Jika kartu ini sedang aktif/dipilih, langsung render ulang grafiknya
       const activeCard = document.querySelector('.prog-card.selected');
       if (activeCard && activeCard.id === `pc-${programKey}`) {
         selectProg(activeCard);
@@ -322,7 +373,6 @@ function saveTask(event) {
       activityContainer.insertAdjacentHTML('afterbegin', logHTML);
     }
 
-    // Update total capaian rata-rata di Dashboard
     let totalPctSum = 0, countProgs = 0;
     for (let key in progData) {
       totalPctSum += progData[key].pct;
@@ -340,7 +390,6 @@ function saveTask(event) {
 
 // ===== INISIALISASI DEFAULT SAAT WEBSITE DIBUKA =====
 document.addEventListener("DOMContentLoaded", function() {
-  // Render KIA secara default saat web pertama kali dimuat
   renderChart(progData.kia.monthsVal, progData.kia.color, progData.kia.target);
   const initialCard = document.getElementById('pc-kia');
   if (initialCard) {
