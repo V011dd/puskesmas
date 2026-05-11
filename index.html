@@ -537,6 +537,7 @@
       <button onclick="closeTaskModal()" class="btn-close">&times;</button>
     </div>
     <form id="task-form" onsubmit="saveTask(event)">
+      <input type="hidden" id="edit-task-id">
       <div class="form-group">
         <label for="task-name">Nama Tugas / Kegiatan</label>
         <input type="text" id="task-name" required placeholder="Contoh: Pemantauan Gizi Balita Melur">
