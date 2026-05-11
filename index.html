@@ -530,28 +530,48 @@
 
   </div>
 </div>
-  <div id="task-modal" class="modal-backdrop" style="display: none;">
+<div id="task-modal" class="modal-backdrop" style="display: none;">
   <div class="modal-content">
     <div class="modal-header">
-      <h3>Tambah Tugas Baru</h3>
+      <h3>Tambah Tugas & Laporan Program</h3>
       <button onclick="closeTaskModal()" class="btn-close">&times;</button>
     </div>
     <form id="task-form" onsubmit="saveTask(event)">
       <div class="form-group">
-        <label for="task-name">Nama Tugas</label>
-        <input type="text" id="task-name" required placeholder="Contoh: Pemantauan Gizi Balita">
+        <label for="task-name">Nama Tugas / Laporan</label>
+        <input type="text" id="task-name" required placeholder="Contoh: Laporan Kunjungan Balita Mei">
       </div>
+      
       <div class="form-group">
-        <label for="task-desc">Deskripsi Tugas</label>
-        <textarea id="task-desc" rows="3" placeholder="Deskripsi detail tugas..."></textarea>
+        <label for="task-program">Pilih Kategori Program</label>
+        <select id="task-program" required style="width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--font); font-size: 13px; outline: none;">
+          <option value="kia">Ibu Hamil (KIA)</option>
+          <option value="imun">Ibu Bersalin</option>
+          <option value="gizi">Bayi Baru Lahir</option>
+          <option value="ptm">Balita</option>
+          <option value="tb">TB</option>
+        </select>
       </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div class="form-group">
+          <label for="report-target">Target Sasaran</label>
+          <input type="number" id="report-target" required placeholder="Contoh: 100">
+        </div>
+        <div class="form-group">
+          <label for="report-actual">Realisasi Capaian</label>
+          <input type="number" id="report-actual" required placeholder="Contoh: 85">
+        </div>
+      </div>
+
       <div class="form-group">
         <label for="task-pic">Penanggung Jawab</label>
-        <input type="text" id="task-pic" required placeholder="Nama penanggung jawab">
+        <input type="text" id="task-pic" required placeholder="Nama penanggung jawab (Bidan/Perawat)">
       </div>
+
       <div class="form-actions">
         <button type="button" onclick="closeTaskModal()" class="btn-secondary">Batal</button>
-        <button type="submit" class="btn-primary">Simpan Tugas</button>
+        <button type="submit" class="btn-primary">Simpan & Sinkronkan</button>
       </div>
     </form>
   </div>
