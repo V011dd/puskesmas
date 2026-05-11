@@ -568,23 +568,35 @@
         <div class="form-group">
           <label for="task-program">Kategori Program Capaian</label>
           <select id="task-program" style="width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--font); font-size: 13px; outline: none; background: #fff;">
-            <option value="kia">Ibu Hamil (KIA)</option>
-            <option value="imun">Ibu Bersalin</option>
-            <option value="gizi">Bayi Baru Lahir</option>
-            <option value="ptm">Balita</option>
-            <option value="tb">TB</option>
+            <option value="kia">Ibu Hamil (KIA) - Target Tahunan: 6.000</option>
+            <option value="imun">Ibu Bersalin - Target Tahunan: 5.000</option>
+            <option value="gizi">Bayi Baru Lahir - Target Tahunan: 4.000</option>
+            <option value="ptm">Balita - Target Tahunan: 8.000</option>
+            <option value="tb">TB - Target Tahunan: 1.000</option>
           </select>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-          <div class="form-group">
-            <label for="report-target">Target Sasaran</label>
-            <input type="number" id="report-target" placeholder="Contoh: 100">
-          </div>
-          <div class="form-group">
-            <label for="report-actual">Realisasi Capaian</label>
-            <input type="number" id="report-actual" placeholder="Contoh: 85">
-          </div>
+        <div class="form-group">
+          <label for="report-month">Bulan Laporan</label>
+          <select id="report-month" style="width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--font); font-size: 13px; outline: none; background: #fff;">
+            <option value="0">Januari</option>
+            <option value="1">Februari</option>
+            <option value="2">Maret</option>
+            <option value="3">April</option>
+            <option value="4">Mei</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="report-actual">Realisasi Capaian Bulan Ini</label>
+          <input type="number" id="report-actual" placeholder="Contoh: 3000">
+        </div>
+
+        <div class="form-group" style="margin-top: 12px;">
+          <label for="report-file" style="display: flex; align-items: center; gap: 4px;">
+            <i class="ti ti-paperclip" style="color: var(--teal-d)"></i> Lampirkan Bukti Fisik (PDF, Word, Excel)
+          </label>
+          <input type="file" id="report-file" accept=".pdf,.doc,.docx,.xls,.xlsx" style="width: 100%; padding: 8px; border: 1px dashed var(--border); border-radius: 8px; font-family: var(--font); font-size: 12px; background: #f8fafc; cursor: pointer;">
         </div>
       </div>
 
