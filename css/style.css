@@ -292,3 +292,44 @@ body {
 /* ===== PAGES ===== */
 .page { display: none; }
 .page.active { display: block; }
+
+/* ===== MODAL STYLE ===== */
+.modal-backdrop {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(15, 23, 42, 0.6); /* Backdrop agak gelap */
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+.modal-content {
+  background: #fff; width: 90%; max-width: 500px;
+  border-radius: 12px; padding: 24px;
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+  animation: modalFadeIn 0.2s ease-out;
+}
+.modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 20px; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px;
+}
+.modal-header h3 { font-size: 18px; font-weight: 700; color: var(--text); }
+.btn-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text3); }
+.btn-close:hover { color: var(--red); }
+
+/* Form di dalam modal */
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--text2); margin-bottom: 6px; }
+.form-group input, .form-group textarea {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--border);
+  border-radius: 8px; font-family: var(--font); font-size: 13px; outline: none;
+}
+.form-group input:focus, .form-group textarea:focus { border-color: var(--teal); }
+
+.form-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
+.btn-secondary { background: #f1f5f9; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; color: var(--text2); }
+.btn-primary { background: linear-gradient(135deg, #16a34a, #0d9488); border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; color: #fff; }
+
+@keyframes modalFadeIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
