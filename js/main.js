@@ -269,24 +269,6 @@ function saveTask(event) {
   // KONDISI A: TUGAS BELUM MULAI / SEDANG PROSES
   // =========================================================
   if (statusValue === 'todo' || statusValue === 'progress') {
-  const taskTime = document.getElementById('task-datetime').value; // Ambil waktu
-  
-  // Tambahkan data-time="${taskTime}" pada tag div task-card
-  const newTaskHTML = `
-    <div class="task-card" id="${currentTaskId}" data-time="${taskTime}">
-      <div class="prio-bar" style="background:var(--amber)"><div style="width:100%;height:3px;background:currentColor;border-radius:3px"></div></div>
-      <div class="task-card-title">${taskName}</div>
-      <div class="task-card-meta">
-        <span class="tag" style="background:#f1f5f9;color:var(--text2)">Belum Mulai</span>
-        <div class="assignee-list">
-          <div class="av" style="background:var(--teal-l);color:var(--teal-d)" title="${taskPic}">${initials}</div>
-        </div>
-      </div>
-      <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text3)">
-        <i class="ti ti-alarm"></i> Mulai: ${new Date(taskTime).toLocaleString('id-ID')}
-      </div>
-    </div>
-    
     let targetColSelector = statusValue === 'todo' ? '#col-todo .task-list-container' : '#col-progress .task-list-container';
     let tagText = statusValue === 'todo' ? 'Belum Mulai' : 'Proses';
     let tagColorStyle = statusValue === 'todo' ? 'background:#f1f5f9;color:var(--text2)' : 'background:var(--blue-l);color:var(--blue-d)';
@@ -498,57 +480,3 @@ document.addEventListener("DOMContentLoaded", function() {
   }
   updateKanbanStats();
 });
-
-// Fungsi untuk memindahkan tugas secara otomatis
-function checkTaskAutomation() {
-  const now = new Date();
-  const todoCards = document.querySelectorAll('#col-todo .task-card');
-
-  todoCards.forEach(card => {
-    const startTimeStr = card.getAttribute('data-time');
-    if (!startTimeStr) return;
-
-    const startTime = new Date(startTimeStr);
-
-    // Jika waktu sekarang sudah melewati atau sama dengan waktu mulai
-    if (now >= startTime) {
-      moveTaskToProgress(card);
-    }
-  });
-}
-
-function moveTaskToProgress(card) {
-  const progressContainer = document.querySelector('#col-progress .task-list-container');
-  const tag = card.querySelector('.tag');
-  const prioBar = card.querySelector('.prio-bar');
-
-  // Ubah tampilan kartu menjadi "Proses"
-  if (tag) {
-    tag.textContent = 'Proses';
-    tag.style.background = 'var(--blue-l)';
-    tag.style.color = 'var(--blue-d)';
-  }
-  if (prioBar) {
-    prioBar.style.background = 'var(--orange)';
-  }
-
-  // Tambahkan tombol Selesaikan (karena sekarang sudah di kolom pengerjaan)
-  const footer = card.lastElementChild;
-  footer.innerHTML = `
-    <span style="font-size:11px; color:var(--text3)"><i class="ti ti-loader"></i> Sedang Dikerjakan</span>
-    <button onclick="openReportForTask('${card.id}')" style="background: var(--green-l); color: var(--green-d); border: none; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 3px;">
-      <i class="ti ti-checklist"></i> Selesaikan
-    </button>
-  `;
-
-  // Pindahkan kartu secara fisik di HTML
-  progressContainer.appendChild(card);
-  
-  // Update angka statistik di header kolom
-  updateKanbanStats();
-  
-  console.log(`Tugas "${card.querySelector('.task-card-title').textContent}" otomatis pindah ke Sedang Dikerjakan.`);
-}
-
-// Jalankan pengecekan setiap 30 detik
-setInterval(checkTaskAutomation, 30000);
