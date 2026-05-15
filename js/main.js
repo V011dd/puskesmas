@@ -479,4 +479,58 @@ document.addEventListener("DOMContentLoaded", function() {
     initialCard.classList.add('selected');
   }
   updateKanbanStats();
+
+  // Fungsi untuk memindahkan tugas secara otomatis
+function checkTaskAutomation() {
+  const now = new Date();
+  const todoCards = document.querySelectorAll('#col-todo .task-card');
+
+  todoCards.forEach(card => {
+    const startTimeStr = card.getAttribute('data-time');
+    if (!startTimeStr) return;
+
+    const startTime = new Date(startTimeStr);
+
+    // Jika waktu sekarang sudah melewati atau sama dengan waktu mulai
+    if (now >= startTime) {
+      moveTaskToProgress(card);
+    }
+  });
+}
+
+function moveTaskToProgress(card) {
+  const progressContainer = document.querySelector('#col-progress .task-list-container');
+  const tag = card.querySelector('.tag');
+  const prioBar = card.querySelector('.prio-bar');
+
+  // Ubah tampilan kartu menjadi "Proses"
+  if (tag) {
+    tag.textContent = 'Proses';
+    tag.style.background = 'var(--blue-l)';
+    tag.style.color = 'var(--blue-d)';
+  }
+  if (prioBar) {
+    prioBar.style.background = 'var(--orange)';
+  }
+
+  // Tambahkan tombol Selesaikan (karena sekarang sudah di kolom pengerjaan)
+  const footer = card.lastElementChild;
+  footer.innerHTML = `
+    <span style="font-size:11px; color:var(--text3)"><i class="ti ti-loader"></i> Sedang Dikerjakan</span>
+    <button onclick="openReportForTask('${card.id}')" style="background: var(--green-l); color: var(--green-d); border: none; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 3px;">
+      <i class="ti ti-checklist"></i> Selesaikan
+    </button>
+  `;
+
+  // Pindahkan kartu secara fisik di HTML
+  progressContainer.appendChild(card);
+  
+  // Update angka statistik di header kolom
+  updateKanbanStats();
+  
+  console.log(`Tugas "${card.querySelector('.task-card-title').textContent}" otomatis pindah ke Sedang Dikerjakan.`);
+}
+
+// Jalankan pengecekan setiap 30 detik
+setInterval(checkTaskAutomation, 30000);
 });
