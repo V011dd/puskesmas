@@ -31,84 +31,257 @@
   </div>
   <div class="sidebar-divider"></div>
   <div class="sidebar-label">Lainnya</div>
-  <div class="nav-item"><i class="ti ti-bell"></i> Notifikasi</div>
-  <div class="nav-item"><i class="ti ti-users"></i> Tim & Profil</div>
+  <div class="nav-item">
+    <i class="ti ti-bell"></i> Notifikasi
+  </div>
+  <div class="nav-item">
+    <i class="ti ti-users"></i> Tim & Profil
+  </div>
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="avatar" style="background:var(--green-l);color:var(--green-d)">DS</div>
+      <div>
+        <div style="font-size:12px;font-weight:700">dr. Sari</div>
+        <div style="font-size:10px;color:var(--text3)">Kepala Puskesmas</div>
+      </div>
+      <i class="ti ti-settings" style="margin-left:auto;color:var(--text3);font-size:16px"></i>
+    </div>
+  </div>
 </div>
 
 <div class="main">
   <div class="topbar">
     <div class="topbar-title" id="page-title">Dashboard</div>
-    <div class="topbar-search"><i class="ti ti-search"></i><span>Cari laporan...</span></div>
-    <div class="avatar" style="background:var(--green-l);color:var(--green-d);font-weight:800;cursor:pointer;">DS</div>
+    <div class="topbar-search"><i class="ti ti-search" style="font-size:15px"></i><span>Cari tugas, program...</span></div>
+    <div class="notif-btn"><i class="ti ti-bell"></i><div class="notif-dot"></div></div>
+    <div class="avatar" style="width:34px;height:34px;background:var(--green-l);color:var(--green-d);font-size:12px;font-weight:800;cursor:pointer;border-radius:50%;flex-shrink:0">DS</div>
   </div>
-
   <div class="content">
+
     <div class="page active" id="page-dash">
+
       <div class="stat-grid">
         <div class="stat-card" style="background:linear-gradient(135deg,#16a34a,#0d9488);color:#fff">
           <div class="stat-label">Total Tugas Aktif</div>
           <div class="stat-val" id="dash-total-tugas">0</div>
+          <div class="stat-sub">Semua tugas di sistem</div>
           <i class="ti ti-checklist stat-icon"></i>
+        </div>
+        <div class="stat-card" style="background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff">
+          <div class="stat-label">Program Terdaftar</div>
+          <div class="stat-val">5</div>
+          <div class="stat-sub">Sesuai program puskesmas</div>
+          <i class="ti ti-clipboard-list stat-icon"></i>
         </div>
         <div class="stat-card" style="background:linear-gradient(135deg,#ea580c,#d97706);color:#fff">
           <div class="stat-label">Rata-rata Capaian</div>
           <div class="stat-val" id="dash-avg-capaian">0%</div>
+          <div class="stat-sub">Akumulasi seluruh program</div>
           <i class="ti ti-chart-pie stat-icon"></i>
+        </div>
+        <div class="stat-card" style="background:linear-gradient(135deg,#db2777,#7c3aed);color:#fff">
+          <div class="stat-label">Anggota Tim</div>
+          <div class="stat-val">12</div>
+          <div class="stat-sub">9 online sekarang</div>
+          <i class="ti ti-users stat-icon"></i>
         </div>
       </div>
 
       <div class="section-grid">
         <div class="card">
-          <div class="section-title"><div class="dot" style="background:var(--green)"></div>Tugas Berjalan</div>
-          <div id="dash-active-tasks-list" style="padding: 20px 0; text-align: center; color: var(--text3);">Belum ada tugas aktif.</div>
+          <div class="section-title">
+            <div class="dot" style="background:var(--green)"></div>
+            Daftar Kegiatan Berjalan
+            <span style="font-size:11px;color:var(--text3);font-weight:600;margin-left:auto">Hari Ini</span>
+          </div>
+          <div id="dash-active-tasks-list" style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="text-align: center; color: var(--text3); font-size: 13px; padding: 24px 0;">Belum ada tugas aktif berjalan.</div>
+          </div>
         </div>
-        <div class="card">
-          <div class="section-title"><div class="dot" style="background:var(--teal)"></div>Capaian Program</div>
-          <div id="dash-capaian-list">
-            </div>
-        </div>
-      </div>
-    </div>
 
-    <div class="page" id="page-tugas">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-        <div id="tugas-stats-text" style="font-weight:700;">0 tugas aktif</div>
-        <button onclick="openTaskModal()" class="btn-primary" style="padding:10px 20px; border:none; border-radius:8px; cursor:pointer; font-weight:700;">+ Tambah Tugas</button>
+        <div class="card">
+          <div class="section-title"><div class="dot" style="background:var(--teal)"></div>Capaian Program Bulan Ini</div>
+          <div id="dash-capaian-program-list">
+            <div class="prog-item" id="dash-prog-kia">
+              <div class="prog-header"><span>Ibu Hamil (KIA)</span><span style="color:var(--green)" class="prog-pct-text">0%</span></div>
+              <div class="prog-bar"><div class="prog-fill" style="width:0%;background:linear-gradient(90deg,#16a34a,#0d9488)"></div></div>
+            </div>
+            <div class="prog-item" id="dash-prog-imun">
+              <div class="prog-header"><span>Ibu bersalin (Imunisasi)</span><span style="color:var(--blue)" class="prog-pct-text">0%</span></div>
+              <div class="prog-bar"><div class="prog-fill" style="width:0%;background:linear-gradient(90deg,#2563eb,#7c3aed)"></div></div>
+            </div>
+            <div class="prog-item" id="dash-prog-gizi">
+              <div class="prog-header"><span>Bayi baru lahir (Gizi)</span><span style="color:var(--orange)" class="prog-pct-text">0%</span></div>
+              <div class="prog-bar"><div class="prog-fill" style="width:0%;background:linear-gradient(90deg,#ea580c,#d97706)"></div></div>
+            </div>
+            <div class="prog-item" id="dash-prog-ptm">
+              <div class="prog-header"><span>Balita (PTM)</span><span style="color:var(--purple)" class="prog-pct-text">0%</span></div>
+              <div class="prog-bar"><div class="prog-fill" style="width:0%;background:linear-gradient(90deg,#7c3aed,#db2777)"></div></div>
+            </div>
+            <div class="prog-item" id="dash-prog-tb">
+              <div class="prog-header"><span>Yang terduga TB (TB & Paru)</span><span style="color:var(--red)" class="prog-pct-text">0%</span></div>
+              <div class="prog-bar"><div class="prog-fill" style="width:0%;background:linear-gradient(90deg,#dc2626,#ea580c)"></div></div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <div class="card">
+        <div class="section-title"><div class="dot" style="background:var(--purple)"></div>Aktivitas Terbaru Tim</div>
+        <div id="dash-activity-list" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
+          <div style="grid-column: span 2; text-align: center; color: var(--text3); font-size: 13px; padding: 12px 0;">Belum ada aktivitas terekam.</div>
+        </div>
+      </div>
+
+    </div><div class="page" id="page-tugas">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div>
+          <div style="font-size:11px;color:var(--text3);font-weight:600;margin-bottom:2px">Sistem Monitoring Terintegrasi</div>
+          <div style="font-size:13px;font-weight:700;color:var(--text)" id="tugas-stats-text">0 tugas aktif · 0 selesai</div>
+        </div>
+        <button onclick="openTaskModal()" style="background:linear-gradient(135deg,#16a34a,#0d9488);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px">
+          <i class="ti ti-plus"></i> Tambah Tugas
+        </button>
+      </div>
+
+      <div class="filter-bar">
+        <span style="font-size:12px;font-weight:700;color:var(--text2)">Filter:</span>
+        <button class="filter-chip active">Semua</button>
+        <button class="filter-chip">Ibu Hamil</button>
+        <button class="filter-chip">Ibu bersalin</button>
+        <button class="filter-chip">Bayi baru lahir</button>
+        <button class="filter-chip">Balita</button>
+        <button class="filter-chip">Yang terduga TB</button>
+        <div style="margin-left:auto;display:flex;gap:8px">
+          <button class="filter-chip"><i class="ti ti-filter" style="font-size:13px;vertical-align:-1px"></i> Filter lanjut</button>
+          <button class="filter-chip"><i class="ti ti-sort-ascending" style="font-size:13px;vertical-align:-1px"></i> Urutan</button>
+        </div>
+      </div>
+
       <div class="kanban">
         <div class="kanban-col" id="col-todo">
-          <div class="col-header"><div class="col-title">Belum Mulai</div><span class="col-count">0</span></div>
-          <div class="task-list-container"></div>
+          <div class="col-header">
+            <div class="col-title"><span style="width:10px;height:10px;background:#94a3b8;border-radius:50%;display:inline-block"></span>Belum Mulai</div>
+            <span class="col-count">0</span>
+          </div>
+          <div class="task-list-container" style="display:flex; flex-direction:column; gap:12px;"></div>
+          <button class="add-task-btn" onclick="openTaskModal()"><i class="ti ti-plus"></i> Tambah tugas</button>
         </div>
+
         <div class="kanban-col" id="col-progress" style="background:var(--blue-l)">
-          <div class="col-header"><div class="col-title">Sedang Dikerjakan</div><span class="col-count">0</span></div>
-          <div class="task-list-container"></div>
+          <div class="col-header">
+            <div class="col-title"><span style="width:10px;height:10px;background:var(--blue);border-radius:50%;display:inline-block"></span>Sedang Dikerjakan</div>
+            <span class="col-count" style="background:#bfdbfe;color:var(--blue-d)">0</span>
+          </div>
+          <div class="task-list-container" style="display:flex; flex-direction:column; gap:12px;"></div>
+          <button class="add-task-btn" onclick="openTaskModal()" style="border-color:#bfdbfe"><i class="ti ti-plus"></i> Tambah tugas</button>
         </div>
+
         <div class="kanban-col" id="col-done" style="background:var(--green-l)">
-          <div class="col-header"><div class="col-title">Selesai</div><span class="col-count">0</span></div>
-          <div class="task-list-container"></div>
+          <div class="col-header">
+            <div class="col-title"><span style="width:10px;height:10px;background:var(--green);border-radius:50%;display:inline-block"></span>Selesai</div>
+            <span class="col-count" style="background:#bbf7d0;color:var(--green-d)">0</span>
+          </div>
+          <div class="task-list-container" style="display:flex; flex-direction:column; gap:12px;"></div>
+          <button class="add-task-btn" onclick="openTaskModal()" style="border-color:#bbf7d0" disabled><i class="ti ti-plus"></i> Selesaikan tugas di kolom aktif</button>
         </div>
       </div>
-    </div>
-
-    <div class="page" id="page-eval">
-      <div class="eval-grid" id="eval-cards-container">
+    </div><div class="page" id="page-eval">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div>
+          <div style="font-size:11px;color:var(--text3);font-weight:600;margin-bottom:2px">Tahun 2026 · Puskesmas Jumpandang Baru</div>
+          <div style="font-size:13px;font-weight:700">Klik kartu program untuk melihat rincian progres data</div>
         </div>
+        <div style="display:flex;gap:8px">
+          <button class="filter-chip active">Semua Program</button>
+          <button class="filter-chip">2026</button>
+          <button class="filter-chip"><i class="ti ti-download" style="font-size:13px;vertical-align:-1px"></i> Export</button>
+        </div>
+      </div>
+
+      <div class="eval-grid">
+        <div class="prog-card" style="background:var(--green-l);color:var(--green-d)" onclick="selectProg(this)" id="pc-kia">
+          <div style="font-size:22px;margin-bottom:6px"><i class="ti ti-heart-plus"></i></div>
+          <div class="prog-card-title">Ibu Hamil (KIA)</div>
+          <div class="prog-card-sub">Pelayanan Kesehatan Ibu Hamil</div>
+          <div class="prog-card-pct">0%</div>
+          <div style="background:rgba(0,0,0,.08);border-radius:20px;height:6px;margin-bottom:6px"><div style="width:0%;background:currentColor;height:6px;border-radius:20px;opacity:.7"></div></div>
+          <div class="prog-card-mini">Target: 6.000 · Tercapai: 0</div>
+        </div>
+        <div class="prog-card" style="background:var(--blue-l);color:var(--blue-d)" onclick="selectProg(this)" id="pc-imun">
+          <div style="font-size:22px;margin-bottom:6px"><i class="ti ti-vaccine"></i></div>
+          <div class="prog-card-title">Ibu Bersalin (Imunisasi)</div>
+          <div class="prog-card-sub">Pelayanan Kesehatan Ibu Bersalin</div>
+          <div class="prog-card-pct">0%</div>
+          <div style="background:rgba(0,0,0,.08);border-radius:20px;height:6px;margin-bottom:6px"><div style="width:0%;background:currentColor;height:6px;border-radius:20px;opacity:.7"></div></div>
+          <div class="prog-card-mini">Target: 5.000 · Tercapai: 0</div>
+        </div>
+        <div class="prog-card" style="background:var(--orange-l);color:var(--orange-d)" onclick="selectProg(this)" id="pc-gizi">
+          <div style="font-size:22px;margin-bottom:6px"><i class="ti ti-apple"></i></div>
+          <div class="prog-card-title">Bayi Baru Lahir (Gizi)</div>
+          <div class="prog-card-sub">Pelayanan Kesehatan Bayi Baru Lahir</div>
+          <div class="prog-card-pct">0%</div>
+          <div style="background:rgba(0,0,0,.08);border-radius:20px;height:6px;margin-bottom:6px"><div style="width:0%;background:currentColor;height:6px;border-radius:20px;opacity:.7"></div></div>
+          <div class="prog-card-mini">Target: 4.000 · Tercapai: 0</div>
+        </div>
+        <div class="prog-card" style="background:var(--purple-l);color:var(--purple-d)" onclick="selectProg(this)" id="pc-ptm">
+          <div style="font-size:22px;margin-bottom:6px"><i class="ti ti-stethoscope"></i></div>
+          <div class="prog-card-title">Balita (PTM)</div>
+          <div class="prog-card-sub">Pelayanan Kesehatan Balita</div>
+          <div class="prog-card-pct">0%</div>
+          <div style="background:rgba(0,0,0,.08);border-radius:20px;height:6px;margin-bottom:6px"><div style="width:0%;background:currentColor;height:6px;border-radius:20px;opacity:.7"></div></div>
+          <div class="prog-card-mini">Target: 8.000 · Tercapai: 0</div>
+        </div>
+        <div class="prog-card" style="background:var(--red-l);color:var(--red-d)" onclick="selectProg(this)" id="pc-tb">
+          <div style="font-size:22px;margin-bottom:6px"><i class="ti ti-lungs"></i></div>
+          <div class="prog-card-title">Yang Terduga TB (TB & Paru)</div>
+          <div class="prog-card-sub">Pelayanan Kesehatan Terduga TB</div>
+          <div class="prog-card-pct">0%</div>
+          <div style="background:rgba(0,0,0,.08);border-radius:20px;height:6px;margin-bottom:6px"><div style="width:0%;background:currentColor;height:6px;border-radius:20px;opacity:.7"></div></div>
+          <div class="prog-card-mini">Target: 1.000 · Tercapai: 0</div>
+        </div>
+      </div>
+
       <div class="detail-grid">
         <div class="card">
-          <div class="section-title"><span id="detail-title">Rincian Laporan</span></div>
+          <div class="section-title"><div class="dot" id="detail-dot" style="background:var(--green)"></div><span id="detail-title">Detail Capaian — KIA (Kesehatan Ibu & Anak)</span></div>
           <table class="month-table">
-            <thead><tr><th>Laporan</th><th>Target</th><th>Realisasi</th><th>%</th><th>Status</th></tr></thead>
-            <tbody id="detail-tbody"></tbody>
+            <thead>
+              <tr><th>Indikator Laporan</th><th>Target Setahun</th><th>Realisasi Input</th><th>% Terhadap Target</th><th>Status</th></tr>
+            </thead>
+            <tbody id="detail-tbody">
+              <tr><td colspan="5" style="text-align: center; color: var(--text3); padding: 24px;">Belum ada input data laporan untuk program ini.</td></tr>
+            </tbody>
           </table>
         </div>
         <div class="card">
-          <div class="section-title">Tren Capaian</div>
+          <div class="section-title"><div class="dot" id="chart-dot" style="background:var(--green)"></div><span id="chart-title">Tren Capaian Jan–Mei 2026</span></div>
           <div class="mini-chart" id="mini-chart"></div>
+          <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+            <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">Ringkasan Program</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div style="background:#f8fafc;border-radius:8px;padding:10px 12px">
+                <div style="font-size:10px;font-weight:700;color:var(--text3)">Target Setahun</div>
+                <div id="sum-target" style="font-size:18px;font-weight:800;color:var(--text)">0</div>
+              </div>
+              <div style="background:#f8fafc;border-radius:8px;padding:10px 12px">
+                <div style="font-size:10px;font-weight:700;color:var(--text3)">Terakumulasi</div>
+                <div id="sum-actual" style="font-size:18px;font-weight:800;color:var(--text)">0</div>
+              </div>
+              <div style="background:#f8fafc;border-radius:8px;padding:10px 12px">
+                <div style="font-size:10px;font-weight:700;color:var(--text3)">Total Persentase</div>
+                <div id="sum-pct" style="font-size:18px;font-weight:800;color:var(--text)">0%</div>
+              </div>
+              <div style="background:#f8fafc;border-radius:8px;padding:10px 12px">
+                <div style="font-size:10px;font-weight:700;color:var(--text3)">Status</div>
+                <div id="sum-status" style="font-size:13px;font-weight:800;color:var(--red)">Belum Ada Data</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
+
+    </div></div>
 </div>
 
 <div id="task-modal" class="modal-backdrop" style="display: none;">
@@ -120,52 +293,83 @@
     <form id="task-form" onsubmit="saveTask(event)">
       <input type="hidden" id="edit-task-id">
       
-      <div id="base-fields">
-        <div class="form-group">
-          <label>Nama Kegiatan</label>
-          <input type="text" id="task-name" required placeholder="Contoh: Posyandu Balita">
-        </div>
-        <div class="form-group">
-          <label>Waktu Mulai (Otomatis Pindah ke 'Proses')</label>
-          <input type="datetime-local" id="task-datetime" required>
-        </div>
-        <div class="form-group">
-          <label>Penanggung Jawab</label>
-          <input type="text" id="task-pic" required>
-        </div>
+      <div class="form-group">
+        <label for="task-name">Nama Kegiatan / Tugas</label>
+        <input type="text" id="task-name" required placeholder="Contoh: Pemantauan Gizi Balita Melur">
+      </div>
+      
+      <div class="form-group">
+        <label for="task-month-select">Bulan Pelaksanaan Kegiatan</label>
+        <select id="task-month-select" required style="width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--font); font-size: 13px; outline: none; background: #fff;">
+          <option value="Januari">Januari (1 Jan - 31 Jan 2026)</option>
+          <option value="Februari">Februari (1 Feb - 28 Feb 2026)</option>
+          <option value="Maret">Maret (1 Mar - 31 Mar 2026)</option>
+          <option value="April">April (1 Apr - 30 Apr 2026)</option>
+          <option value="Mei">Mei (1 Mei - 31 Mei 2026)</option>
+        </select>
       </div>
 
-      <div id="report-fields-wrapper" style="display: none; border-top: 2px dashed #eee; padding-top:15px; margin-top:15px;">
+      <div class="form-group">
+  <label for="task-datetime">Waktu Mulai Pengerjaan</label>
+  <input type="datetime-local" id="task-datetime" required style="width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--font); font-size: 13px;">
+  <small style="color: var(--text3); font-size: 10px;">Tugas akan otomatis pindah ke 'Sedang Dikerjakan' pada waktu ini.</small>
+</div>
+
+      <div class="form-group">
+        <label for="task-pic">Nama Penanggung Jawab</label>
+        <input type="text" id="task-pic" required placeholder="Contoh: Bidan Rani">
+      </div>
+
+      <div class="form-group">
+        <label for="task-status">Status Alur Kerja</label>
+        <select id="task-status" onchange="toggleReportFields()" required style="width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--font); font-size: 13px; outline: none; background: #fff;">
+          <option value="todo">Belum Mulai</option>
+          <option value="progress">Sedang Dikerjakan</option>
+          <option value="done" id="opt-status-done" style="display: none;">Selesaikan & Input Laporan</option>
+        </select>
+      </div>
+
+      <div id="report-fields-wrapper" style="display: none; border-top: 2px dashed var(--border); padding-top: 14px; margin-top: 14px;">
+        <h4 style="font-size: 13px; font-weight: 800; color: var(--teal-d); margin-bottom: 12px;"><i class="ti ti-file-analytics"></i> Pengisian Realisasi Laporan</h4>
+        
         <div class="form-group">
-          <label>Kategori Program</label>
-          <select id="task-program">
+          <label for="task-program">Kategori Program Capaian</label>
+          <select id="task-program" style="width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--font); font-size: 13px; outline: none; background: #fff;">
             <option value="kia">Ibu Hamil (KIA) - Target: 6.000</option>
-            <option value="imun">Ibu Bersalin - Target: 5.000</option>
-            <option value="gizi">Bayi Baru Lahir - Target: 4.000</option>
+            <option value="imun">Ibu Bersalin (Imunisasi) - Target: 5.000</option>
+            <option value="gizi">Bayi Baru Lahir (Gizi) - Target: 4.000</option>
             <option value="ptm">Balita (PTM) - Target: 8.000</option>
-            <option value="tb">TB & Paru - Target: 1.000</option>
+            <option value="tb">Yang Terduga TB (TB & Paru) - Target: 1.000</option>
           </select>
         </div>
+
         <div class="form-group">
-          <label>Bulan Laporan</label>
-          <select id="report-month">
-            <option value="0">Januari</option><option value="1">Februari</option>
-            <option value="2">Maret</option><option value="3">April</option><option value="4">Mei</option>
+          <label for="report-month">Bulan Laporan</label>
+          <select id="report-month" style="width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--font); font-size: 13px; outline: none; background: #fff;">
+            <option value="0">Januari</option>
+            <option value="1">Februari</option>
+            <option value="2">Maret</option>
+            <option value="3">April</option>
+            <option value="4">Mei</option>
           </select>
         </div>
+
         <div class="form-group">
-          <label>Realisasi Capaian</label>
-          <input type="number" id="report-actual">
+          <label for="report-actual">Realisasi Capaian Bulan Ini</label>
+          <input type="number" id="report-actual" placeholder="Masukkan jumlah riil (contoh: 3000)">
         </div>
+
         <div class="form-group">
-          <label>Bukti Fisik (Opsional)</label>
-          <input type="file" id="report-file" accept=".pdf,.doc,.docx,.xls,.xlsx">
+          <label for="report-file" style="display: flex; align-items: center; gap: 4px;">
+            <i class="ti ti-paperclip" style="color: var(--teal-d)"></i> Berkas Bukti Fisik (PDF / Word / Excel) <span style="font-weight: 500; color: var(--text3); font-size: 11px;">(Opsional)</span>
+          </label>
+          <input type="file" id="report-file" accept=".pdf,.doc,.docx,.xls,.xlsx" style="width: 100%; padding: 8px; border: 1px dashed var(--border); border-radius: 8px; font-family: var(--font); font-size: 12px; background: #f8fafc; cursor: pointer;">
         </div>
       </div>
 
-      <div class="form-actions" style="margin-top:20px; display:flex; justify-content:flex-end; gap:10px;">
+      <div class="form-actions" style="margin-top: 20px;">
         <button type="button" onclick="closeTaskModal()" class="btn-secondary">Batal</button>
-        <button type="submit" class="btn-primary" id="btn-save">Simpan Tugas</button>
+        <button type="submit" class="btn-primary">Simpan</button>
       </div>
     </form>
   </div>
