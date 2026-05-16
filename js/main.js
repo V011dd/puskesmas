@@ -1,7 +1,89 @@
-// ===== NAVIGASI HALAMAN =====
-const pages  = ['dash', 'tugas', 'eval'];
-const titles = { dash: 'Dashboard', tugas: 'Manajemen Tugas', eval: 'Evaluasi Capaian Program' };
+// ===== INIT DATABASE DI LOCALSTORAGE =====
+// Default Users (Alur 1 & 4)
+const defaultUsers = [
+  { username: 'admin', password: '123', name: 'Dr. Utama', initials: 'AD', role: 'admin', program: 'all' },
+  { username: 'drsari', password: '123', name: 'dr. Sari', initials: 'DS', role: 'nakes', program: 'kia' },
+  { username: 'bidanrani', password: '123', name: 'Bidan Rani', initials: 'BR', role: 'nakes', program: 'imun' }
+];
 
+// Default Data Program
+const defaultProgData = {
+  kia: { id: 'kia', title: 'Ibu Hamil (KIA)', color: '#16a34a', monthsVal: [0,0,0,0,0,0,0,0,0,0,0,0], target: 6000, actual: 0, pct: 0 },
+  imun: { id: 'imun', title: 'Ibu Bersalin (Imunisasi)', color: '#2563eb', monthsVal: [0,0,0,0,0,0,0,0,0,0,0,0], target: 5000, actual: 0, pct: 0 },
+  gizi: { id: 'gizi', title: 'Bayi Baru Lahir (Gizi)', color: '#ea580c', monthsVal: [0,0,0,0,0,0,0,0,0,0,0,0], target: 4000, actual: 0, pct: 0 },
+  ptm: { id: 'ptm', title: 'Balita (PTM)', color: '#7c3aed', monthsVal: [0,0,0,0,0,0,0,0,0,0,0,0], target: 8000, actual: 0, pct: 0 },
+  tb: { id: 'tb', title: 'Yang Terduga TB', color: '#dc2626', monthsVal: [0,0,0,0,0,0,0,0,0,0,0,0], target: 1000, actual: 0, pct: 0 }
+};
+
+const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+// Muat data jika kosong
+if (!localStorage.getItem('syncHealth_users')) {
+  localStorage.setItem('syncHealth_users', JSON.stringify(defaultUsers));
+}
+if (!localStorage.getItem('syncHealth_progData')) {
+  localStorage.setItem('syncHealth_progData', JSON.stringify(defaultProgData));
+}
+
+let currentUser = null;
+let progData = JSON.parse(localStorage.getItem('syncHealth_progData'));
+
+// ===== SISTEM LOGIN & LOGOUT (ALUR 1 & 5) =====
+function checkLoginState() {
+  const sessionUser = sessionStorage.getItem('syncHealth_loggedIn');
+  if (sessionUser) {
+    currentUser = JSON.parse(sessionUser);
+    document.getElementById('login-view').style.display = 'none';
+    document.getElementById('app-view').style.display = 'flex';
+    initApp();
+  } else {
+    document.getElementById('login-view').style.display = 'flex';
+    document.getElementById('app-view').style.display = 'none';
+  }
+}
+
+function handleLogin() {
+  const u = document.getElementById('login-username').value;
+  const p = document.getElementById('login-password').value;
+  const users = JSON.parse(localStorage.getItem('syncHealth_users'));
+  
+  const foundUser = users.find(user => user.username === u && user.password === p);
+  if (foundUser) {
+    sessionStorage.setItem('syncHealth_loggedIn', JSON.stringify(foundUser));
+    checkLoginState();
+  } else {
+    alert("Username atau Password salah!");
+  }
+}
+
+function handleLogout() {
+  sessionStorage.removeItem('syncHealth_loggedIn');
+  window.location.reload();
+}
+
+// ===== INISIALISASI APLIKASI =====
+function initApp() {
+  // Set UI Berdasarkan Role (Alur 4)
+  document.getElementById('sidebar-name').textContent = currentUser.name;
+  document.getElementById('sidebar-role').textContent = currentUser.role === 'admin' ? 'Kepala Puskesmas' : 'Penanggung Jawab Program';
+  document.getElementById('sidebar-avatar').textContent = currentUser.initials;
+  document.getElementById('topbar-avatar').textContent = currentUser.initials;
+  
+  if (currentUser.role === 'admin') {
+    document.getElementById('btn-tambah-manual').style.display = 'flex';
+  }
+
+  // Set Waktu Sekarang
+  const currentMonthIdx = new Date().getMonth();
+  document.getElementById('dash-current-month').textContent = monthNames[currentMonthIdx];
+
+  renderDashboardStats();
+  autoGenerateMonthlyTask(); // (Alur 3)
+  goPage('dash');
+}
+
+// ===== NAVIGASI HALAMAN =====
+const pages = ['dash', 'tugas', 'eval'];
 function goPage(p) {
   pages.forEach(x => {
     document.getElementById('page-' + x).classList.toggle('active', x === p);
@@ -16,236 +98,156 @@ function goPage(p) {
       n.style.color = '';
     }
   });
-  document.getElementById('page-title').textContent = titles[p];
-  if (p === 'eval') {
-    const activeCard = document.querySelector('.prog-card.selected') || document.getElementById('pc-kia');
-    if (activeCard) selectProg(activeCard);
-  }
+  
+  if (p === 'eval') renderEvaluasi();
 }
 
-// ===== FILTER CHIPS =====
-document.querySelectorAll('.filter-chip').forEach(btn => {
-  btn.addEventListener('click', function () {
-    this.closest('.filter-bar').querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
-    this.classList.add('active');
+// ===== TUGAS OTOMATIS BERDASARKAN BULAN (ALUR 3) =====
+function autoGenerateMonthlyTask() {
+  const currentMonthIdx = new Date().getMonth(); 
+  const currentMonthName = monthNames[currentMonthIdx];
+  
+  const colProgress = document.querySelector('#col-progress .task-list-container');
+  const colDone = document.querySelector('#col-done .task-list-container');
+  
+  colProgress.innerHTML = '';
+  colDone.innerHTML = '';
+
+  // Filter program yg bisa dilihat user (Admin lihat semua, Nakes lihat programnya sendiri)
+  const userPrograms = currentUser.role === 'admin' ? Object.keys(progData) : [currentUser.program];
+
+  userPrograms.forEach(key => {
+    const data = progData[key];
+    const isDone = data.monthsVal[currentMonthIdx] > 0; // Cek apa bulan ini sudah diisi
+
+    if (!isDone) {
+      // TUGAS BELUM SELESAI
+      colProgress.insertAdjacentHTML('beforeend', `
+        <div class="task-card">
+          <div class="prio-bar" style="background:var(--amber)"><div style="width:100%;height:3px;background:currentColor;border-radius:3px"></div></div>
+          <div class="task-card-title">Input Realisasi ${data.title}</div>
+          <div class="task-card-meta">
+            <span class="tag" style="background:var(--blue-l);color:var(--blue-d)">Wajib Bulan ${currentMonthName}</span>
+          </div>
+          <div class="task-footer" style="margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border);">
+            <button onclick="openAutoReport('${key}', ${currentMonthIdx})" style="background:var(--green-l); color:var(--green-d); border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:700; width:100%">Isi Laporan Sekarang</button>
+          </div>
+        </div>`);
+    } else {
+      // TUGAS SUDAH SELESAI
+      colDone.insertAdjacentHTML('beforeend', `
+        <div class="task-card">
+          <div class="prio-bar" style="background:var(--green)"><div style="width:100%;height:3px;background:currentColor;border-radius:3px"></div></div>
+          <div class="task-card-title">Realisasi ${data.title} Selesai</div>
+          <div class="task-card-meta">
+            <span class="tag" style="background:var(--green-l);color:var(--green-d)">Capaian: ${data.monthsVal[currentMonthIdx]}</span>
+          </div>
+        </div>`);
+    }
   });
-});
 
-// ===== DATA PROGRAM EVALUASI (SET KE 0% UNTUK AWALAN) =====
-let progData = {
-  kia: { title: 'KIA (Kesehatan Ibu & Anak)', color: '#16a34a', dot: '#16a34a', monthsVal: [0,0,0,0,0], target: 6000, actual: 0, pct: 0, status: 'Belum Ada Data', rows: [] },
-  imun: { title: 'Ibu Bersalin (Imunisasi)', color: '#2563eb', dot: '#2563eb', monthsVal: [0,0,0,0,0], target: 5000, actual: 0, pct: 0, status: 'Belum Ada Data', rows: [] },
-  gizi: { title: 'Bayi Baru Lahir (Gizi)', color: '#ea580c', dot: '#ea580c', monthsVal: [0,0,0,0,0], target: 4000, actual: 0, pct: 0, status: 'Belum Ada Data', rows: [] },
-  ptm: { title: 'Balita (PTM)', color: '#7c3aed', dot: '#7c3aed', monthsVal: [0,0,0,0,0], target: 8000, actual: 0, pct: 0, status: 'Belum Ada Data', rows: [] },
-  tb: { title: 'Yang Terduga TB (TB & Paru)', color: '#dc2626', dot: '#dc2626', monthsVal: [0,0,0,0,0], target: 1000, actual: 0, pct: 0, status: 'Belum Ada Data', rows: [] }
-};
-
-// ===== RENDER BAR CHART =====
-function renderChart(monthsVal, color, targetTotal) {
-  const labels    = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei'];
-  const container = document.getElementById('mini-chart');
-  if (!container) return;
-  const percentages = monthsVal.map(val => targetTotal > 0 ? Math.round((val / targetTotal) * 100) : 0);
-  const maxPct = Math.max(...percentages, 1); 
-  container.innerHTML = percentages.map((p, i) => `
-    <div class="bar-wrap">
-      <div class="bar-val">${p}%</div>
-      <div class="bar" style="height:${Math.round((p / maxPct) * 60)}px;background:${color};opacity:${0.4 + 0.6 * (p / maxPct)}"></div>
-      <div class="bar-label">${labels[i]} (${monthsVal[i]})</div>
-    </div>`).join('');
+  const progressCount = colProgress.children.length;
+  const doneCount = colDone.children.length;
+  
+  document.querySelector('#col-progress .col-count').textContent = progressCount;
+  document.querySelector('#col-done .col-count').textContent = doneCount;
+  document.getElementById('badge-tugas-total').textContent = progressCount;
+  document.getElementById('dash-total-tugas').textContent = progressCount + doneCount;
 }
 
-// ===== FUNGSI PILIH PROGRAM EVALUASI =====
-function selectProg(el) {
-  document.querySelectorAll('.prog-card').forEach(c => { c.classList.remove('selected'); c.style.borderColor = 'transparent'; });
-  el.classList.add('selected'); el.style.borderColor = 'currentColor';
-  const key = el.id.replace('pc-', ''); const d = progData[key];
-  if (!d) return;
-  document.getElementById('detail-title').textContent = 'Detail Capaian — ' + d.title;
-  document.getElementById('sum-target').textContent = d.target.toLocaleString('id-ID');
-  document.getElementById('sum-actual').textContent = d.actual.toLocaleString('id-ID');
-  document.getElementById('sum-pct').textContent = d.pct + '%';
-  const sc = document.getElementById('sum-status'); sc.textContent = d.status;
-  sc.style.color = d.pct >= 80 ? '#16a34a' : d.pct >= 40 ? '#d97706' : '#dc2626';
-  const tbody = document.getElementById('detail-tbody');
-  if (d.rows.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text3); padding: 24px;">Belum ada input data laporan.</td></tr>`;
-  } else {
-    tbody.innerHTML = d.rows.map(r => `<tr><td>${r[0]}</td><td>${r[1].toLocaleString('id-ID')}</td><td>${r[2].toLocaleString('id-ID')}</td><td>${r[3]}%</td><td>${r[4]}</td></tr>`).join('');
-  }
-  renderChart(d.monthsVal, d.color, d.target);
-}
-
-// ===== LOGIKA MODAL =====
-function openTaskModal() {
-  const modal = document.getElementById('task-modal');
-  if (modal) {
-    document.getElementById('modal-title-text').textContent = 'Tambah Tugas Baru';
-    document.getElementById('edit-task-id').value = '';
-    document.getElementById('task-status').value = 'todo';
-    document.getElementById('task-status').disabled = false;
-    document.getElementById('opt-status-done').style.display = 'none';
-    modal.style.display = 'flex';
-    toggleReportFields();
-  }
+// ===== INPUT & SIMPAN LAPORAN =====
+function openAutoReport(programKey, monthIdx) {
+  const data = progData[programKey];
+  document.getElementById('task-name').value = data.title;
+  document.getElementById('report-month-name').value = monthNames[monthIdx];
+  document.getElementById('task-program').value = programKey;
+  document.getElementById('report-month').value = monthIdx;
+  document.getElementById('report-actual').value = '';
+  
+  document.getElementById('task-modal').style.display = 'flex';
 }
 
 function closeTaskModal() {
-  const modal = document.getElementById('task-modal');
-  if (modal) modal.style.display = 'none';
-  document.getElementById('task-form').reset();
+  document.getElementById('task-modal').style.display = 'none';
 }
 
-function toggleReportFields() {
-  const statusSelect = document.getElementById('task-status');
-  const reportWrapper = document.getElementById('report-fields-wrapper');
-  if (statusSelect && reportWrapper) {
-    reportWrapper.style.display = statusSelect.value === 'done' ? 'block' : 'none';
-  }
-}
-
-function openReportForTask(taskId) {
-  const taskCard = document.getElementById(taskId);
-  if (!taskCard) return;
-  document.getElementById('modal-title-text').textContent = 'Selesaikan & Isi Laporan';
-  document.getElementById('edit-task-id').value = taskId;
-  document.getElementById('task-name').value = taskCard.querySelector('.task-card-title').textContent;
-  document.getElementById('task-pic').value = taskCard.querySelector('.av').getAttribute('title');
-  const statusSelect = document.getElementById('task-status');
-  document.getElementById('opt-status-done').style.display = 'block';
-  statusSelect.value = 'done';
-  statusSelect.disabled = true;
-  document.getElementById('task-modal').style.display = 'flex';
-  toggleReportFields();
-}
-
-// ===== SIMPAN TUGAS & OTOMATISASI =====
-function saveTask(event) {
+function saveReport(event) {
   event.preventDefault();
-  const taskIdToEdit = document.getElementById('edit-task-id').value;
-  const taskName = document.getElementById('task-name').value;
-  const taskPic = document.getElementById('task-pic').value;
-  const statusValue = document.getElementById('task-status').value;
-  const initials = taskPic.split(' ').map(w => w[0]).join('').toUpperCase().substring(0, 2);
+  const programKey = document.getElementById('task-program').value;
+  const monthIdx = parseInt(document.getElementById('report-month').value);
+  const actualVal = parseInt(document.getElementById('report-actual').value);
 
-  if (taskIdToEdit) {
-    const oldCard = document.getElementById(taskIdToEdit);
-    if (oldCard) oldCard.remove();
-  }
-  const currentTaskId = taskIdToEdit || 'task-' + Date.now();
-
-  // KONDISI A: BELUM MULAI / PROSES (DENGAN ATRIBUT WAKTU)
-  if (statusValue === 'todo' || statusValue === 'progress') {
-    const taskTime = document.getElementById('task-datetime').value;
-    let targetColSelector = statusValue === 'todo' ? '#col-todo .task-list-container' : '#col-progress .task-list-container';
-    
-    const newTaskHTML = `
-        <div class="task-card" id="${currentTaskId}" data-time="${taskTime}">
-          <div class="prio-bar" style="background:${statusValue === 'progress' ? 'var(--orange)' : 'var(--amber)'}"><div style="width:100%;height:3px;background:currentColor;border-radius:3px"></div></div>
-          <div class="task-card-title">${taskName}</div>
-          <div class="task-card-meta">
-            <span class="tag" style="${statusValue === 'todo' ? 'background:#f1f5f9;color:var(--text2)' : 'background:var(--blue-l);color:var(--blue-d)'}">${statusValue === 'todo' ? 'Belum Mulai' : 'Proses'}</span>
-            <div class="assignee-list">
-              <div class="av" style="background:var(--teal-l);color:var(--teal-d)" title="${taskPic}">${initials}</div>
-            </div>
-          </div>
-          <div class="task-footer" style="margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text3)">
-            ${statusValue === 'todo' ? `<i class="ti ti-alarm"></i> Mulai: ${new Date(taskTime).toLocaleString('id-ID')}` : 
-            `<span style="display:flex; justify-content:space-between; align-items:center;">
-              <span><i class="ti ti-loader"></i> Sedang Dikerjakan</span>
-              <button onclick="openReportForTask('${currentTaskId}')" style="background:var(--green-l); color:var(--green-d); border:none; padding:4px 8px; border-radius:6px; cursor:pointer; font-weight:700;">Selesaikan</button>
-            </span>`}
-          </div>
-        </div>`;
-    document.querySelector(targetColSelector).insertAdjacentHTML('beforeend', newTaskHTML);
-  } 
+  // Update Data Program
+  progData[programKey].monthsVal[monthIdx] = actualVal;
   
-  // KONDISI B: SELESAI & SINKRONISASI
-  else if (statusValue === 'done') {
-    const programKey = document.getElementById('task-program').value;
-    const monthIndex = parseInt(document.getElementById('report-month').value);
-    const actualVal = parseInt(document.getElementById('report-actual').value) || 0;
-    const prog = progData[programKey];
+  // Hitung ulang akumulasi Total
+  let totalActual = 0;
+  progData[programKey].monthsVal.forEach(v => totalActual += v);
+  progData[programKey].actual = totalActual;
+  progData[programKey].pct = Math.min(100, Math.round((totalActual / progData[programKey].target) * 100));
 
-    if (prog) {
-      prog.actual += actualVal;
-      prog.monthsVal[monthIndex] += actualVal;
-      prog.pct = Math.round((prog.actual / prog.target) * 100);
-      prog.status = prog.pct >= 80 ? 'On Track' : (prog.pct >= 50 ? 'Butuh Perhatian' : 'Kritis');
-      const contributionPct = Math.round((actualVal / prog.target) * 100);
-      prog.rows.push([`${taskName}`, prog.target, actualVal, contributionPct, 'Baik']);
+  // Simpan ke LocalStorage agar permanen
+  localStorage.setItem('syncHealth_progData', JSON.stringify(progData));
 
-      const doneHTML = `
-        <div class="task-card">
-          <div class="prio-bar" style="background:var(--green)"><div style="width:100%;height:3px;background:currentColor;border-radius:3px"></div></div>
-          <div class="task-card-title">${taskName}</div>
-          <div style="font-size:11px; color:var(--text2); margin-bottom:8px;">Capaian: +${actualVal.toLocaleString('id-ID')} (${contributionPct}%)</div>
-          <div class="task-card-meta">
-            <span class="tag" style="background:var(--green-l);color:var(--green-d)">Selesai</span>
-            <div class="assignee-list"><div class="av" style="background:var(--teal-l);color:var(--teal-d)" title="${taskPic}">${initials}</div></div>
-          </div>
-        </div>`;
-      document.querySelector('#col-done .task-list-container').insertAdjacentHTML('beforeend', doneHTML);
-    }
-  }
-  updateKanbanStats(); closeTaskModal();
+  closeTaskModal();
+  initApp(); // Refresh Tampilan
+  alert(`Laporan ${progData[programKey].title} bulan ${monthNames[monthIdx]} berhasil disimpan!`);
 }
 
-// ===== AUTOMATION =====
-function checkTaskAutomation() {
-  const now = new Date();
-  document.querySelectorAll('#col-todo .task-card').forEach(card => {
-    const startTimeStr = card.getAttribute('data-time');
-    if (startTimeStr && now >= new Date(startTimeStr)) {
-      moveTaskToProgress(card);
-    }
-  });
-}
-
-function moveTaskToProgress(card) {
-  const progressContainer = document.querySelector('#col-progress .task-list-container');
-  const tag = card.querySelector('.tag');
-  const prioBar = card.querySelector('.prio-bar');
-  if (tag) { tag.textContent = 'Proses'; tag.style.background = 'var(--blue-l)'; tag.style.color = 'var(--blue-d)'; }
-  if (prioBar) prioBar.style.background = 'var(--orange)';
-  
-  card.querySelector('.task-footer').innerHTML = `
-    <span style="display:flex; justify-content:space-between; align-items:center; width:100%;">
-      <span><i class="ti ti-loader"></i> Sedang Dikerjakan</span>
-      <button onclick="openReportForTask('${card.id}')" style="background:var(--green-l); color:var(--green-d); border:none; padding:4px 8px; border-radius:6px; cursor:pointer; font-weight:700;">Selesaikan</button>
-    </span>`;
-  progressContainer.appendChild(card);
-  updateKanbanStats();
-}
-setInterval(checkTaskAutomation, 10000); // Cek setiap 10 detik
-
-// ===== STATS & DASHBOARD =====
-function updateKanbanStats() {
-  const todo = document.querySelectorAll('#col-todo .task-card').length;
-  const progress = document.querySelectorAll('#col-progress .task-card').length;
-  const done = document.querySelectorAll('#col-done .task-card').length;
-  
-  document.getElementById('badge-tugas-total').textContent = todo + progress;
-  document.getElementById('tugas-stats-text').textContent = `${todo + progress} aktif · ${done} selesai`;
-  document.querySelector('#col-todo .col-count').textContent = todo;
-  document.querySelector('#col-progress .col-count').textContent = progress;
-  document.querySelector('#col-done .col-count').textContent = done;
-  document.getElementById('dash-total-tugas').textContent = todo + progress + done;
-
-  // Update Capaian Dash
+// ===== RENDER DASHBOARD & EVALUASI =====
+function renderDashboardStats() {
+  const container = document.getElementById('dash-capaian-program-list');
+  container.innerHTML = '';
   let totalPct = 0;
-  for (let k in progData) {
-    totalPct += progData[k].pct;
-    const item = document.getElementById(`dash-prog-${k}`);
-    if (item) {
-        item.querySelector('.prog-pct-text').textContent = progData[k].pct + '%';
-        item.querySelector('.prog-fill').style.width = progData[k].pct + '%';
-    }
-  }
-  document.getElementById('dash-avg-capaian').textContent = Math.round(totalPct/5) + '%';
+  
+  Object.keys(progData).forEach(key => {
+    const data = progData[key];
+    totalPct += data.pct;
+    container.insertAdjacentHTML('beforeend', `
+      <div class="prog-item">
+        <div class="prog-header"><span>${data.title}</span><span style="color:${data.color}" class="prog-pct-text">${data.pct}%</span></div>
+        <div class="prog-bar"><div class="prog-fill" style="width:${data.pct}%;background:${data.color}"></div></div>
+      </div>`);
+  });
+
+  document.getElementById('dash-avg-capaian').textContent = Math.round(totalPct / 5) + '%';
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  updateKanbanStats();
-  goPage('dash');
-});
+function renderEvaluasi() {
+  const container = document.getElementById('eval-cards-container');
+  container.innerHTML = '';
+  
+  Object.keys(progData).forEach(key => {
+    const data = progData[key];
+    container.insertAdjacentHTML('beforeend', `
+      <div class="prog-card" style="background:${data.color}20; color:${data.color}" onclick="selectProgEval('${key}')">
+        <div class="prog-card-title">${data.title}</div>
+        <div class="prog-card-pct">${data.pct}%</div>
+        <div class="prog-card-mini">Target: ${data.target} · Tercapai: ${data.actual}</div>
+      </div>`);
+  });
+  
+  // Pilih item pertama secara default
+  selectProgEval('kia');
+}
+
+function selectProgEval(key) {
+  const data = progData[key];
+  document.getElementById('detail-title').textContent = data.title;
+  document.getElementById('sum-target').textContent = data.target.toLocaleString('id-ID');
+  document.getElementById('sum-actual').textContent = data.actual.toLocaleString('id-ID');
+  
+  const tbody = document.getElementById('detail-tbody');
+  tbody.innerHTML = '';
+  
+  // Tampilkan data bulan 1 sampai bulan sekarang
+  const currentMonthIdx = new Date().getMonth();
+  for(let i = 0; i <= currentMonthIdx; i++) {
+    const val = data.monthsVal[i];
+    const status = val > 0 ? `<span style="color:var(--green)">Selesai</span>` : `<span style="color:var(--red)">Belum</span>`;
+    tbody.insertAdjacentHTML('beforeend', `<tr><td>${monthNames[i]}</td><td>${val.toLocaleString('id-ID')}</td><td>${status}</td></tr>`);
+  }
+}
+
+// Jalankan saat load
+document.addEventListener("DOMContentLoaded", checkLoginState);
